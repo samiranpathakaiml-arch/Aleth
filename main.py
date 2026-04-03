@@ -32,6 +32,9 @@ _env = AlethEnv()
 class ResetRequest(BaseModel):
     task: str = "easy"
 
+class StepRequest(BaseModel):
+    action: Dict[str, Any]
+
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
@@ -40,22 +43,29 @@ async def reset(req: ResetRequest):
     """Reset the environment for the given task and return the initial observation."""
     try:
         obs = _env.reset(task=req.task)
-        return obs.model_dump()
+        # OpenEnv expects ResetResponse with wrapper fields
+        return {
+            "observation": obs.model_dump(mode="json"),
+            "reward": None,
+            "done": False,
+            "info": {}
+        }
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
 
 
 @app.post("/step")
-async def step(action: Dict[str, Any]):
+async def step(req: StepRequest):
     """
-    Execute one action. Accepts the action dict directly, e.g.:
-      {"action_type": "read_paper", "paper_id": "devlin2019"}
+    Execute one action. Accepts an action dict nested under 'action':
+      {"action": {"action_type": "read_paper", "paper_id": "devlin2019"}}
     """
     try:
-        obs, reward, done, info = _env.step(action)
+        obs, reward, done, info = _env.step(req.action)
+        # OpenEnv expects StepResponse with wrapper fields
         return {
-            "observation": obs.model_dump(),
-            "reward":      reward.model_dump(),
+            "observation": obs.model_dump(mode="json"),
+            "reward":      reward.model_dump(mode="json"),
             "done":        done,
             "info":        info,
         }
