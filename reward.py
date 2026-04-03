@@ -1,117 +1,96 @@
 """
-Aleth - Dense Reward Computation
-Provides continuous feedback throughout episode
+Aleth — Dense Reward Computation Engine (absolute imports, flat structure)
+
+Reward signals:
+  relevant_read        +0.02   irrelevant_read       -0.05   reread_penalty  -0.01
+  verification_accuracy 0-0.5  reasoning_bonus       +0.10   read_before_verify +0.03
+  verify_without_reading -0.10 correct_drift_detection +0.20  false_drift_flag  -0.10
+  progress              +0.02×remaining   step_penalty -0.001
 """
 
 from typing import Dict, Set
-from .models import (
+from models import (                                  # absolute import
     State, Action, Reward, GroundTruth, Paper,
     ReadPaperAction, VerifyClaimAction, FlagDriftAction,
-    AccessLevel
+    AccessLevel,
 )
 
 
 class AlethRewardComputer:
-    """Computes dense rewards with multiple signals"""
-    
+    """Computes dense shaped rewards for every environment step."""
+
     def __init__(self, ground_truth: Dict[str, GroundTruth], papers: Dict[str, Paper]):
-        self.ground_truth = ground_truth
-        self.papers = papers
-        self.relevant_papers = self._build_relevant_papers()
-    
+        self.ground_truth    = ground_truth
+        self.papers          = papers
+        self.relevant_papers: Set[str] = self._build_relevant_papers()
+
+    # ── Public API ────────────────────────────────────────────────────────────
+
+    def compute_reward(self, action: Action, prev_state: State, new_state: State) -> Reward:
+        bd: Dict[str, float] = {}
+
+        if isinstance(action, ReadPaperAction):
+            self._reading(action, prev_state, bd)
+        elif isinstance(action, VerifyClaimAction):
+            self._verification(action, new_state, bd)
+        elif isinstance(action, FlagDriftAction):
+            self._drift(action, bd)
+
+        self._progress(prev_state, new_state, bd)
+        bd["step_penalty"] = -0.001
+
+        return Reward(total=round(sum(bd.values()), 6), breakdown=bd)
+
+    # ── Private ───────────────────────────────────────────────────────────────
+
     def _build_relevant_papers(self) -> Set[str]:
-        """Build set of papers actually cited"""
-        relevant = set()
+        r: Set[str] = set()
         for gt in self.ground_truth.values():
             if gt.primary_evidence_paper:
-                relevant.add(gt.primary_evidence_paper)
+                r.add(gt.primary_evidence_paper)
             if gt.drift_chain:
-                relevant.update(gt.drift_chain)
-        return relevant
-    
-    def compute_reward(self, action: Action, prev_state: State, new_state: State) -> Reward:
-        """Compute reward for action"""
-        breakdown = {}
-        
-        # Type-specific rewards
-        if isinstance(action, ReadPaperAction):
-            self._add_reading_rewards(action, prev_state, new_state, breakdown)
-        elif isinstance(action, VerifyClaimAction):
-            self._add_verification_rewards(action, prev_state, new_state, breakdown)
-        elif isinstance(action, FlagDriftAction):
-            self._add_drift_rewards(action, prev_state, new_state, breakdown)
-        
-        # Global rewards
-        self._add_progress_rewards(action, prev_state, new_state, breakdown)
-        breakdown['step_penalty'] = -0.001  # Encourage efficiency
-        
-        total = sum(breakdown.values())
-        return Reward(total=total, breakdown=breakdown)
-    
-    def _add_reading_rewards(self, action, prev_state, new_state, breakdown):
-        """Rewards for reading papers"""
-        paper_id = action.paper_id
-        
-        if paper_id in self.relevant_papers:
-            breakdown['relevant_read'] = 0.02
-        else:
-            breakdown['irrelevant_read'] = -0.05
-        
-        if paper_id in prev_state.papers_read:
-            breakdown['reread_penalty'] = -0.01
-    
-    def _add_verification_rewards(self, action, prev_state, new_state, breakdown):
-        """Rewards for verifying claims"""
-        claim_id = action.claim_id
-        
-        if claim_id not in self.ground_truth:
+                r.update(gt.drift_chain)
+        return r
+
+    def _reading(self, action: ReadPaperAction, prev: State, bd: Dict) -> None:
+        pid = action.paper_id
+        bd["relevant_read" if pid in self.relevant_papers else "irrelevant_read"] = \
+            0.02 if pid in self.relevant_papers else -0.05
+        if pid in prev.papers_read:
+            bd["reread_penalty"] = -0.01
+
+    def _verification(self, action: VerifyClaimAction, new: State, bd: Dict) -> None:
+        cid = action.claim_id
+        if cid not in self.ground_truth:
             return
-        
-        gt = self.ground_truth[claim_id]
-        
-        # Accuracy reward (continuous)
+        gt    = self.ground_truth[cid]
         error = abs(action.support_score - gt.true_support_score)
-        accuracy = max(0.0, 1.0 - error)
-        breakdown['verification_accuracy'] = accuracy * 0.5
-        
-        # Reasoning bonus
-        if self._has_key_concepts(action.reasoning, gt.key_concepts):
-            breakdown['reasoning_bonus'] = 0.1
-        
-        # Check if read papers before verifying
-        claim = new_state.claims[claim_id]
-        read_citations = set(new_state.papers_read) & set(claim.citations)
-        if read_citations:
-            breakdown['read_before_verify'] = 0.03
-        else:
-            breakdown['verify_without_reading'] = -0.1
-    
-    def _add_drift_rewards(self, action, prev_state, new_state, breakdown):
-        """Rewards for drift detection"""
-        claim_id = action.claim_id
-        
-        if claim_id not in self.ground_truth:
+        bd["verification_accuracy"] = round(max(0.0, 1.0 - error) * 0.5, 6)
+        if self._key_concepts_match(action.reasoning, gt.key_concepts):
+            bd["reasoning_bonus"] = 0.1
+        claim = new.claims.get(cid)
+        if claim:
+            if set(new.papers_read) & set(claim.citations):
+                bd["read_before_verify"] = 0.03
+            else:
+                bd["verify_without_reading"] = -0.1
+
+    def _drift(self, action: FlagDriftAction, bd: Dict) -> None:
+        cid = action.claim_id
+        if cid not in self.ground_truth:
             return
-        
-        gt = self.ground_truth[claim_id]
-        
-        if gt.has_citation_drift:
-            breakdown['correct_drift_detection'] = 0.2
-        else:
-            breakdown['false_drift_flag'] = -0.1
-    
-    def _add_progress_rewards(self, action, prev_state, new_state, breakdown):
-        """Progress-based rewards"""
-        prev_progress = len(prev_state.verifications) / len(prev_state.claims)
-        new_progress = len(new_state.verifications) / len(new_state.claims)
-        
-        if new_progress > prev_progress:
-            breakdown['progress'] = 0.02 * (1.0 - prev_progress)
-    
-    def _has_key_concepts(self, reasoning: str, key_concepts: list) -> bool:
-        """Check if reasoning contains key concepts"""
-        if not key_concepts:
+        bd["correct_drift_detection" if self.ground_truth[cid].has_citation_drift
+           else "false_drift_flag"] = \
+            0.2 if self.ground_truth[cid].has_citation_drift else -0.1
+
+    def _progress(self, prev: State, new: State, bd: Dict) -> None:
+        if not prev.claims:
+            return
+        if len(new.verifications) > len(prev.verifications):
+            bd["progress"] = round(0.02 * (1.0 - len(prev.verifications) / len(prev.claims)), 6)
+
+    def _key_concepts_match(self, reasoning: str, concepts: list) -> bool:
+        if not concepts:
             return True
-        reasoning_lower = reasoning.lower()
-        matches = sum(1 for c in key_concepts if c.lower() in reasoning_lower)
-        return matches >= len(key_concepts) * 0.6
+        low = reasoning.lower()
+        return sum(1 for c in concepts if c.lower() in low) >= len(concepts) * 0.6

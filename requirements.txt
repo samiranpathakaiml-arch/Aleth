@@ -1,7 +1,16 @@
-# Aleth — Scientific Citation Verification Environment
-# Core environment and API dependencies
+# Aleth — OpenEnv Citation Verification Benchmark
+# All dependencies for server + inference
 
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 typing-extensions>=4.5.0
+
+# LLM inference
 openai>=1.0.0
+
+# FastAPI server (OpenEnv submission)
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# OpenEnv SDK (install if provided by hackathon; optional)
+# openenv-core

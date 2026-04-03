@@ -1,77 +1,66 @@
 """
-Aleth - Deterministic Grading Logic
+Aleth — Deterministic Grading Logic (absolute imports, flat structure)
+60% accuracy | 30% reasoning quality | 10% drift detection
 """
 
 from typing import Dict
-from .models import State, GroundTruth, Verification
+from models import State, GroundTruth, Verification   # absolute import
 
 
 class AlethGrader:
-    """Deterministic grader - always returns same score for same input"""
-    
+    """Deterministic episode grader — same inputs always produce same score."""
+
     def __init__(self, ground_truth: Dict[str, GroundTruth]):
         self.ground_truth = ground_truth
-    
+
+    # ── Public API ────────────────────────────────────────────────────────────
+
     def grade_episode(self, state: State) -> float:
-        """
-        Grade complete episode.
-        Returns score in [0.0, 1.0]
-        """
+        """Average claim score over all claims in ground truth. Unverified = 0.0."""
         if not self.ground_truth:
             return 0.0
-        
-        total_score = 0.0
-        for claim_id, gt in self.ground_truth.items():
-            if claim_id in state.verifications:
-                score = self.grade_claim(claim_id, state.verifications[claim_id])
-            else:
-                score = 0.0  # Unverified claims get 0
-            total_score += score
-        
-        return total_score / len(self.ground_truth)
-    
+        total = sum(
+            self.grade_claim(cid, state.verifications[cid])
+            if cid in state.verifications else 0.0
+            for cid in self.ground_truth
+        )
+        return round(total / len(self.ground_truth), 6)
+
     def grade_claim(self, claim_id: str, verification: Verification) -> float:
         """
-        Grade single claim.
-        
-        Breakdown:
-        - 60% accuracy of support score
-        - 30% reasoning quality
-        - 10% drift detection
+        Score = 0.6 × accuracy + 0.3 × reasoning_quality + 0.1 × drift_detection
         """
         gt = self.ground_truth[claim_id]
-        
-        # 1. Support score accuracy
-        error = abs(verification.support_score - gt.true_support_score)
-        accuracy = max(0.0, 1.0 - error)
-        
-        # 2. Reasoning quality (check for key concepts)
-        reasoning_lower = verification.reasoning.lower()
-        concepts_found = sum(
-            1 for concept in gt.key_concepts
-            if concept.lower() in reasoning_lower
-        )
-        reasoning_score = concepts_found / len(gt.key_concepts) if gt.key_concepts else 1.0
-        
-        # 3. Drift detection
-        drift_score = 1.0 if verification.flagged_drift == gt.has_citation_drift else 0.0
-        
-        # Weighted total
-        return 0.6 * accuracy + 0.3 * reasoning_score + 0.1 * drift_score
-    
+        accuracy  = max(0.0, 1.0 - abs(verification.support_score - gt.true_support_score))
+        reasoning = self._reasoning_quality(verification.reasoning, gt.key_concepts)
+        drift     = 1.0 if verification.flagged_drift == gt.has_citation_drift else 0.0
+        return round(0.6 * accuracy + 0.3 * reasoning + 0.1 * drift, 6)
+
     def get_detailed_breakdown(self, state: State) -> Dict:
-        """Get detailed scores for debugging"""
-        breakdown = {}
-        for claim_id, gt in self.ground_truth.items():
-            if claim_id in state.verifications:
-                v = state.verifications[claim_id]
-                error = abs(v.support_score - gt.true_support_score)
-                breakdown[claim_id] = {
-                    'accuracy': max(0.0, 1.0 - error),
-                    'gt_score': gt.true_support_score,
-                    'agent_score': v.support_score,
-                    'total': self.grade_claim(claim_id, v)
-                }
-            else:
-                breakdown[claim_id] = {'total': 0.0, 'note': 'Not verified'}
+        """Per-claim grading breakdown for post-episode analysis."""
+        breakdown: Dict = {}
+        for cid, gt in self.ground_truth.items():
+            if cid not in state.verifications:
+                breakdown[cid] = {"total": 0.0, "note": "Not verified"}
+                continue
+            v        = state.verifications[cid]
+            accuracy = max(0.0, 1.0 - abs(v.support_score - gt.true_support_score))
+            reasoning= self._reasoning_quality(v.reasoning, gt.key_concepts)
+            drift    = 1.0 if v.flagged_drift == gt.has_citation_drift else 0.0
+            breakdown[cid] = {
+                "gt_support_score":    gt.true_support_score,
+                "agent_support_score": v.support_score,
+                "accuracy_component":  round(0.6 * accuracy,  4),
+                "reasoning_component": round(0.3 * reasoning, 4),
+                "drift_component":     round(0.1 * drift,     4),
+                "total":               self.grade_claim(cid, v),
+            }
         return breakdown
+
+    # ── Private ───────────────────────────────────────────────────────────────
+
+    def _reasoning_quality(self, reasoning: str, key_concepts: list) -> float:
+        if not key_concepts:
+            return 1.0
+        low = reasoning.lower()
+        return sum(1 for c in key_concepts if c.lower() in low) / len(key_concepts)

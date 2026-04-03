@@ -1,281 +1,221 @@
 """
-Aleth - Main Environment Class
-Implements OpenEnv specification
+Aleth — Main Environment Class (absolute imports, flat structure)
+
+OpenEnv API:
+  env = AlethEnv()
+  obs = env.reset(task="easy")
+  obs, reward, done, info = env.step(action_dict)
+  state = env.state()
 """
 
 import json
 from typing import Dict, Tuple, Any, Optional
 from pathlib import Path
 
-from .models import (
+from models import (                                  # absolute import
     Action, Observation, Reward, State,
     ReadPaperAction, VerifyClaimAction, FlagDriftAction, SubmitAction,
     Claim, Paper, GroundTruth, Verification,
-    PaperContent, VerificationFeedback, AccessLevel
+    PaperContent, VerificationFeedback, AccessLevel,
 )
-from .grader import AlethGrader
-from .reward import AlethRewardComputer
+from grader import AlethGrader                        # absolute import
+from reward import AlethRewardComputer                # absolute import
 
 
 class AlethEnv:
     """
-    Aleth Citation Verification Environment
-    
-    OpenEnv API:
-    - reset(task) -> Observation
-    - step(action) -> (Observation, Reward, done, info)
-    - state() -> State
+    Aleth Citation Verification Environment — OpenEnv compliant.
+
+    Args:
+        data_dir: Directory containing task_*.json files.
+            Defaults to ``data/`` relative to this file (root/data/).
     """
-    
+
     def __init__(self, data_dir: Optional[str] = None):
         if data_dir is None:
+            # Works for both flat-root and aleth-package layouts
             data_dir = Path(__file__).parent / "data"
         self.data_dir = Path(data_dir)
-        
-        self._state: Optional[State] = None
-        self.grader: Optional[AlethGrader] = None
+
+        self._state:          Optional[State]               = None
+        self.grader:          Optional[AlethGrader]         = None
         self.reward_computer: Optional[AlethRewardComputer] = None
-    
+
+    # ── OpenEnv API ───────────────────────────────────────────────────────────
+
     def reset(self, task: str = "easy") -> Observation:
-        """Reset environment to initial state"""
-        # Load task data
+        """Load task JSON, initialise state/grader/reward, return first Observation."""
         task_file = self.data_dir / f"task_{task}.json"
         if not task_file.exists():
-            raise ValueError(f"Task file not found: {task_file}")
-        
-        with open(task_file, 'r') as f:
-            task_data = json.load(f)
-        
-        # Parse into Pydantic models
-        claims = {c['id']: Claim(**c) for c in task_data['claims']}
-        papers = {p['id']: Paper(**p) for p in task_data['papers'].values()}
-        ground_truth = {gt['claim_id']: GroundTruth(**gt) for gt in task_data['ground_truth']}
-        
-        # Initialize state
+            available = [f.stem.replace("task_", "") for f in self.data_dir.glob("task_*.json")]
+            raise ValueError(f"Task '{task}' not found. Available: {available}")
+
+        with open(task_file, "r", encoding="utf-8") as f:
+            td = json.load(f)
+
+        claims       = {c["id"]: Claim(**c) for c in td["claims"]}
+        papers       = {pid: Paper(**pd) for pid, pd in td["papers"].items()}
+        ground_truth = {g["claim_id"]: GroundTruth(**g) for g in td["ground_truth"]}
+
         self._state = State(
-            task_id=task,
-            claims=claims,
-            papers=papers,
-            ground_truth=ground_truth,
-            verifications={},
-            papers_read=[],
-            step_count=0,
-            max_steps=task_data.get('max_steps'),
-            episode_done=False
+            task_id=task, claims=claims, papers=papers,
+            ground_truth=ground_truth, verifications={}, papers_read=[],
+            step_count=0, max_steps=td.get("max_steps"), episode_done=False,
         )
-        
-        self.grader = AlethGrader(ground_truth)
+        self.grader          = AlethGrader(ground_truth)
         self.reward_computer = AlethRewardComputer(ground_truth, papers)
-        
-        return self._make_observation(
-            message=f"Task initialized: {len(claims)} claims to verify",
-            papers_content=[],
-            feedback=None
+
+        summary = "\n".join(
+            f"  [{cid}] {c.text}  (cites: {', '.join(c.citations)})"
+            for cid, c in claims.items()
         )
-    
+        return self._obs(
+            f"Task '{task}' initialised: {len(claims)} claims.\n{summary}\n\n"
+            f"Papers available: {', '.join(papers)}\n\n"
+            "Read cited papers, then verify each claim. Submit when done.",
+            [], None,
+        )
+
     def step(self, action: Dict[str, Any]) -> Tuple[Observation, Reward, bool, Dict]:
-        """Execute one step"""
+        """Execute one action, return (Observation, Reward, done, info)."""
         if self._state is None:
-            raise RuntimeError("Call reset() first")
+            raise RuntimeError("Call reset() first.")
         if self._state.episode_done:
-            raise RuntimeError("Episode done. Call reset()")
-        
-        # Parse action
-        parsed_action = self._parse_action(action)
-        
-        # Store previous state
+            raise RuntimeError("Episode done — call reset() to start a new episode.")
+
+        parsed     = self._parse_action(action)
         prev_state = self._state.model_copy(deep=True)
-        
-        # Execute action
-        obs, info = self._execute_action(parsed_action)
-        
-        # Compute reward
-        reward = self.reward_computer.compute_reward(parsed_action, prev_state, self._state)
-        
-        # Update step count
+        obs, info  = self._execute(parsed)
+
         self._state.step_count += 1
-        
-        # Check if done
-        done = self._check_done(parsed_action)
+        reward = self.reward_computer.compute_reward(parsed, prev_state, self._state)
+        done   = self._is_done(parsed)
         self._state.episode_done = done
-        
-        # Final grading
+
         if done:
-            final_score = self.grader.grade_episode(self._state)
-            info['final_score'] = final_score
-            info['grading_breakdown'] = self.grader.get_detailed_breakdown(self._state)
-        
+            info["final_score"]       = self.grader.grade_episode(self._state)
+            info["grading_breakdown"] = self.grader.get_detailed_breakdown(self._state)
+            info["steps_taken"]       = self._state.step_count
+
         return obs, reward, done, info
-    
+
     def state(self) -> State:
-        """Return current state"""
+        """Return deep copy of current internal state."""
         if self._state is None:
-            raise RuntimeError("Call reset() first")
+            raise RuntimeError("Call reset() first.")
         return self._state.model_copy(deep=True)
-    
-    # ========================================================================
-    # PRIVATE METHODS
-    # ========================================================================
-    
+
+    # ── Action dispatch ───────────────────────────────────────────────────────
+
     def _parse_action(self, action: Dict) -> Action:
-        """Parse dict to Action model"""
-        action_type = action.get('action_type')
-        
-        if action_type == 'read_paper':
-            return ReadPaperAction(**action)
-        elif action_type == 'verify_claim':
-            return VerifyClaimAction(**action)
-        elif action_type == 'flag_drift':
-            return FlagDriftAction(**action)
-        elif action_type == 'submit':
-            return SubmitAction(**action)
-        else:
-            raise ValueError(f"Unknown action: {action_type}")
-    
-    def _execute_action(self, action: Action) -> Tuple[Observation, Dict]:
-        """Execute action and return observation"""
-        info = {'action_type': action.action_type}
-        
-        if isinstance(action, ReadPaperAction):
-            return self._handle_read(action, info)
-        elif isinstance(action, VerifyClaimAction):
-            return self._handle_verify(action, info)
-        elif isinstance(action, FlagDriftAction):
-            return self._handle_flag(action, info)
-        elif isinstance(action, SubmitAction):
-            return self._handle_submit(action, info)
-    
-    def _handle_read(self, action: ReadPaperAction, info: Dict) -> Tuple[Observation, Dict]:
-        """Handle read_paper action"""
-        paper_id = action.paper_id
-        
-        if paper_id not in self._state.papers:
-            return self._make_observation(
-                message=f"Error: Paper '{paper_id}' not found",
-                papers_content=[],
-                feedback=None
-            ), info
-        
-        paper = self._state.papers[paper_id]
-        
-        # Track reading
-        if paper_id not in self._state.papers_read:
-            self._state.papers_read.append(paper_id)
-        
-        # Determine text based on access level
+        t = action.get("action_type")
+        if t == "read_paper":    return ReadPaperAction(**action)
+        if t == "verify_claim":  return VerifyClaimAction(**action)
+        if t == "flag_drift":    return FlagDriftAction(**action)
+        if t == "submit":        return SubmitAction(**action)
+        raise ValueError(f"Unknown action_type '{t}'. "
+                         "Must be: read_paper | verify_claim | flag_drift | submit")
+
+    def _execute(self, action: Action) -> Tuple[Observation, Dict]:
+        info: Dict[str, Any] = {"action_type": action.action_type}
+        if isinstance(action, ReadPaperAction):    return self._read(action, info)
+        if isinstance(action, VerifyClaimAction):  return self._verify(action, info)
+        if isinstance(action, FlagDriftAction):    return self._flag(action, info)
+        if isinstance(action, SubmitAction):       return self._submit(action, info)
+        raise ValueError(f"Unhandled action type: {type(action)}")
+
+    def _read(self, action: ReadPaperAction, info: Dict) -> Tuple[Observation, Dict]:
+        pid = action.paper_id
+        if pid not in self._state.papers:
+            return self._obs(f"Error: paper '{pid}' not found. "
+                             f"Available: {list(self._state.papers)}", [], None), info
+
+        paper = self._state.papers[pid]
+        if pid not in self._state.papers_read:
+            self._state.papers_read.append(pid)
+
         if paper.access_level == AccessLevel.FULL_TEXT:
-            text = paper.full_text or paper.abstract
-            sections = ["abstract", "introduction", "results"]
+            text, sections = paper.full_text or paper.abstract, \
+                             ["abstract", "introduction", "methods", "results", "conclusion"]
         elif paper.access_level == AccessLevel.ABSTRACT_ONLY:
-            text = paper.abstract
-            sections = ["abstract"]
+            text, sections = paper.abstract, ["abstract"]
         else:
-            text = f"Title: {paper.title}\nAccess restricted."
+            text     = f"Title: {paper.title} ({paper.year})\n" \
+                       f"Authors: {', '.join(paper.authors)}\n[Access Restricted]"
             sections = []
-        
-        content = PaperContent(
-            paper_id=paper_id,
-            content_type=paper.access_level,
-            text=text,
-            sections_available=sections
-        )
-        
-        info['paper_read'] = paper_id
-        return self._make_observation(
-            message=f"Read: {paper.title}",
-            papers_content=[content],
-            feedback=None
-        ), info
-    
-    def _handle_verify(self, action: VerifyClaimAction, info: Dict) -> Tuple[Observation, Dict]:
-        """Handle verify_claim action"""
-        claim_id = action.claim_id
-        
-        if claim_id not in self._state.claims:
-            return self._make_observation(
-                message=f"Error: Claim '{claim_id}' not found",
-                papers_content=[],
-                feedback=None
-            ), info
-        
-        # Store verification
-        verification = Verification(
-            claim_id=claim_id,
-            support_score=action.support_score,
-            reasoning=action.reasoning,
+
+        info.update(paper_read=pid, access_level=paper.access_level.value)
+        content = PaperContent(paper_id=pid, content_type=paper.access_level,
+                               text=text, sections_available=sections)
+        return self._obs(f"Read '{paper.title}' ({paper.year}) — {paper.access_level.value}.",
+                         [content], None), info
+
+    def _verify(self, action: VerifyClaimAction, info: Dict) -> Tuple[Observation, Dict]:
+        cid = action.claim_id
+        if cid not in self._state.claims:
+            return self._obs(f"Error: claim '{cid}' not found. "
+                             f"Available: {list(self._state.claims)}", [], None), info
+
+        score = max(0.0, min(1.0, action.support_score))
+        self._state.verifications[cid] = Verification(
+            claim_id=cid, support_score=score, reasoning=action.reasoning,
             primary_evidence_paper=action.primary_evidence_paper,
-            timestamp=self._state.step_count
+            timestamp=self._state.step_count,
         )
-        self._state.verifications[claim_id] = verification
-        
-        # Partial feedback
-        feedback = None
-        if claim_id in self._state.ground_truth:
-            gt = self._state.ground_truth[claim_id]
-            error = abs(action.support_score - gt.true_support_score)
-            partial_score = max(0, 1.0 - error)
-            feedback = VerificationFeedback(claim_id=claim_id, partial_score=partial_score)
-        
-        info['claim_verified'] = claim_id
-        return self._make_observation(
-            message=f"Verified {claim_id} (score: {action.support_score:.2f})",
-            papers_content=[],
-            feedback=feedback
-        ), info
-    
-    def _handle_flag(self, action: FlagDriftAction, info: Dict) -> Tuple[Observation, Dict]:
-        """Handle flag_drift action"""
-        claim_id = action.claim_id
-        
-        if claim_id in self._state.verifications:
-            self._state.verifications[claim_id].flagged_drift = True
-            self._state.verifications[claim_id].drift_explanation = action.drift_explanation
+
+        fb = None
+        if cid in self._state.ground_truth:
+            gt    = self._state.ground_truth[cid]
+            error = abs(score - gt.true_support_score)
+            ps    = round(max(0.0, 1.0 - error), 4)
+            hint  = ("Score quite far from evidence." if error > 0.4
+                     else "Score moderately off." if error > 0.2 else None)
+            fb = VerificationFeedback(claim_id=cid, partial_score=ps, hints=hint)
+
+        info.update(claim_verified=cid, support_score=score)
+        v, t = len(self._state.verifications), len(self._state.claims)
+        return self._obs(f"Verified '{cid}' (score={score:.2f}). {v}/{t} done.",
+                         [], fb), info
+
+    def _flag(self, action: FlagDriftAction, info: Dict) -> Tuple[Observation, Dict]:
+        cid = action.claim_id
+        if cid in self._state.verifications:
+            self._state.verifications[cid].flagged_drift     = True
+            self._state.verifications[cid].drift_explanation = action.drift_explanation
         else:
-            self._state.verifications[claim_id] = Verification(
-                claim_id=claim_id,
-                support_score=0.0,
-                reasoning="",
-                flagged_drift=True,
-                drift_explanation=action.drift_explanation,
-                timestamp=self._state.step_count
+            self._state.verifications[cid] = Verification(
+                claim_id=cid, support_score=0.0,
+                reasoning="(drift flagged before verification)",
+                flagged_drift=True, drift_explanation=action.drift_explanation,
+                timestamp=self._state.step_count,
             )
-        
-        info['drift_flagged'] = claim_id
-        return self._make_observation(
-            message=f"Flagged drift for {claim_id}",
-            papers_content=[],
-            feedback=None
-        ), info
-    
-    def _handle_submit(self, action: SubmitAction, info: Dict) -> Tuple[Observation, Dict]:
-        """Handle submit action"""
-        verified = len(self._state.verifications)
-        total = len(self._state.claims)
-        
-        info['submitted'] = True
-        info['verified_count'] = verified
-        info['total_count'] = total
-        
-        return self._make_observation(
-            message=f"Submitted {verified}/{total} verifications",
-            papers_content=[],
-            feedback=None
-        ), info
-    
-    def _make_observation(self, message: str, papers_content: list, feedback) -> Observation:
-        """Create observation"""
+        info.update(drift_flagged=cid, citation_chain=action.citation_chain)
+        return self._obs(
+            f"Drift flagged for '{cid}'. Chain: {' -> '.join(action.citation_chain)}",
+            [], None), info
+
+    def _submit(self, action: SubmitAction, info: Dict) -> Tuple[Observation, Dict]:
+        v, t   = len(self._state.verifications), len(self._state.claims)
+        missed = [cid for cid in self._state.claims if cid not in self._state.verifications]
+        info.update(submitted=True, verified_count=v, total_count=t, unverified_claims=missed)
+        return self._obs(
+            f"Submitted! {v}/{t} verified. "
+            + (f"Unverified: {missed}" if missed else "All claims covered."),
+            [], None), info
+
+    # ── Utilities ─────────────────────────────────────────────────────────────
+
+    def _obs(self, message: str, papers_content: list, feedback) -> Observation:
+        assert self._state is not None
         return Observation(
-            message=message,
-            papers_content=papers_content,
-            feedback=feedback,
+            message=message, papers_content=papers_content, feedback=feedback,
             claims_verified=len(self._state.verifications),
             claims_total=len(self._state.claims),
             step_count=self._state.step_count,
-            papers_read=self._state.papers_read.copy()
+            papers_read=list(self._state.papers_read),
         )
-    
-    def _check_done(self, action: Action) -> bool:
-        """Check if episode is done"""
+
+    def _is_done(self, action: Action) -> bool:
         if isinstance(action, SubmitAction):
             return True
         if self._state.max_steps and self._state.step_count >= self._state.max_steps:

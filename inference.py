@@ -11,7 +11,7 @@ import json
 import time
 from typing import Dict, Any, List
 from openai import OpenAI
-from aleth import AlethEnv
+from environment import AlethEnv          # flat-structure absolute import
 
 # MANDATORY Environment Variables per Hackathon Spec
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
