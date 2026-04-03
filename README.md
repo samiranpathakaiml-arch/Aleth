@@ -1,3 +1,14 @@
+---
+title: Aleth
+emoji: 🔬
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # Aleth 🔍
 
 **v1.1.0** — OpenEnv-compliant benchmark for scientific citation verification and drift detection.
