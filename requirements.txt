@@ -1,0 +1,7 @@
+# Aleth — Scientific Citation Verification Environment
+# Core environment and API dependencies
+
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+typing-extensions>=4.5.0
+openai>=1.0.0

@@ -1,0 +1,145 @@
+# openenv.yaml — Aleth Environment Specification
+# Conforms to the OpenEnv benchmark protocol v1.0
+
+name: aleth
+version: "1.1.0"
+description: >
+  Aleth is a scientific citation verification benchmark.
+  An AI agent must determine whether claims in academic papers
+  are accurately supported by their citations, and detect citation drift.
+
+# ----------------------------------------------------------------
+# TASKS
+# ----------------------------------------------------------------
+tasks:
+  easy:
+    description: "5 well-known NLP paper claims (BERT, GPT-3, Transformer, ResNet, Dropout)"
+    num_claims: 5
+    max_steps: 50
+    avg_papers_per_claim: 1
+  medium:
+    description: "15 claims involving multi-citation synthesis and restricted access (Abstract Only)"
+    num_claims: 15
+    max_steps: 100
+    avg_papers_per_claim: 2
+  hard:
+    description: "30 adversarial claims focusing on Citation Drift and contradictory sources"
+    num_claims: 30
+    max_steps: 150
+    avg_papers_per_claim: 3
+
+# ----------------------------------------------------------------
+# ACTION SPACE
+# ----------------------------------------------------------------
+action_space:
+  type: union
+  actions:
+    read_paper:
+      description: "Read a paper from the corpus"
+      fields:
+        paper_id:
+          type: string
+          required: true
+
+    verify_claim:
+      description: "Submit verification for a claim"
+      fields:
+        claim_id:
+          type: string
+          required: true
+        support_score:
+          type: float
+          range: [0.0, 1.0]
+          required: true
+        reasoning:
+          type: string
+          required: true
+        primary_evidence_paper:
+          type: string
+          required: false
+
+    flag_drift:
+      description: "Flag citation drift across a chain of papers"
+      fields:
+        claim_id:
+          type: string
+          required: true
+        citation_chain:
+          type: list[string]
+          required: true
+        drift_explanation:
+          type: string
+          required: true
+
+    submit:
+      description: "Finalise and grade the episode"
+      fields: {}
+
+# ----------------------------------------------------------------
+# OBSERVATION SPACE
+# ----------------------------------------------------------------
+observation_space:
+  type: dict
+  fields:
+    message:
+      type: string
+      description: "Human-readable description of last step result"
+    papers_content:
+      type: list[PaperContent]
+      description: "Paper texts returned by read_paper actions"
+    feedback:
+      type: VerificationFeedback
+      nullable: true
+      description: "Partial score feedback after verify_claim"
+    claims_verified:
+      type: integer
+    claims_total:
+      type: integer
+    step_count:
+      type: integer
+    papers_read:
+      type: list[string]
+
+# ----------------------------------------------------------------
+# REWARD RANGE
+# ----------------------------------------------------------------
+reward_range: [-0.5, 2.0]
+
+reward_signals:
+  relevant_read:         +0.02
+  irrelevant_read:       -0.05
+  reread_penalty:        -0.01
+  verification_accuracy: "continuous [0, 0.5]"
+  reasoning_bonus:       +0.10
+  read_before_verify:    +0.03
+  verify_without_reading: -0.10
+  correct_drift_detection: +0.20
+  false_drift_flag:      -0.10
+  progress:              "+0.02 * remaining_fraction"
+  step_penalty:          -0.001
+
+# ----------------------------------------------------------------
+# GRADING
+# ----------------------------------------------------------------
+grading:
+  metric: average_claim_score
+  formula: "mean over all claims of: 0.6*accuracy + 0.3*reasoning + 0.1*drift"
+  range: [0.0, 1.0]
+  breakdown:
+    accuracy:    0.60  # |agent_score - gt_score| penalised linearly
+    reasoning:   0.30  # fraction of key concepts present in reasoning
+    drift:       0.10  # correct drift flag (binary)
+
+# ----------------------------------------------------------------
+# BASELINE
+# ----------------------------------------------------------------
+baseline:
+  model: "claude-3-5-sonnet-20241022"
+  strategy: "state-aware sequential verification"
+  scores:
+    easy: 0.8720
+    medium: 0.7500
+    hard: 0.6200
+  notes: >
+    Baseline verified on Easy task (0.8720) using OpenAI-compatible client. 
+    Medium and Hard tasks are implemented for adversarial testing of citation drift.

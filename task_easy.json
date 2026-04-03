@@ -1,0 +1,135 @@
+{
+  "task_id": "easy",
+  "max_steps": 50,
+  "claims": [
+    {
+      "id": "claim_001",
+      "text": "BERT achieved 93.2% accuracy on the GLUE benchmark",
+      "citations": ["devlin2019"],
+      "context": "Recent transformer models have shown impressive results. BERT achieved 93.2% accuracy on the GLUE benchmark, establishing new state-of-the-art performance.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_002",
+      "text": "GPT-3 contains over 200 billion parameters",
+      "citations": ["brown2020"],
+      "context": "Large language models continue to scale. GPT-3 contains over 200 billion parameters, making it the largest model at the time.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_003",
+      "text": "Transformer models use self-attention mechanisms to process sequences",
+      "citations": ["vaswani2017"],
+      "context": "Modern NLP architectures have evolved significantly. Transformer models use self-attention mechanisms to process sequences without recurrence.",
+      "claim_type": "methodological"
+    },
+    {
+      "id": "claim_004",
+      "text": "ResNet won ImageNet 2015 with 3.6% error rate",
+      "citations": ["he2016"],
+      "context": "Deep residual networks revolutionized computer vision. ResNet won ImageNet 2015 with 3.6% error rate, surpassing human performance.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_005",
+      "text": "Dropout randomly deactivates neurons during training to prevent overfitting",
+      "citations": ["srivastava2014"],
+      "context": "Regularization is crucial in deep learning. Dropout randomly deactivates neurons during training to prevent overfitting.",
+      "claim_type": "methodological"
+    }
+  ],
+  "papers": {
+    "devlin2019": {
+      "id": "devlin2019",
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+      "abstract": "We introduce BERT, which stands for Bidirectional Encoder Representations from Transformers. BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.",
+      "full_text": "ABSTRACT: We introduce BERT, a new language representation model which stands for Bidirectional Encoder Representations from Transformers.\n\nINTRODUCTION: Language model pre-training has been shown to be effective for improving many natural language processing tasks.\n\nRESULTS: Table 1 shows our results on the GLUE benchmark. BERT-Large achieves 93.2% accuracy on the overall GLUE score, establishing a new state-of-the-art across all tasks. This represents a significant improvement over previous work.\n\nCONCLUSION: We have introduced BERT and shown its effectiveness for a wide range of NLP tasks through extensive experiments.",
+      "year": 2019,
+      "authors": ["Jacob Devlin", "Ming-Wei Chang", "Kenton Lee"],
+      "access_level": "full_text"
+    },
+    "brown2020": {
+      "id": "brown2020",
+      "title": "Language Models are Few-Shot Learners",
+      "abstract": "Recent work has demonstrated substantial gains on many NLP tasks through pre-training on large corpora followed by fine-tuning. We show that scaling up language models greatly improves task-agnostic, few-shot performance. We train GPT-3, an autoregressive language model with 175 billion parameters.",
+      "full_text": "ABSTRACT: We train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model.\n\nINTRODUCTION: We demonstrate that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches.\n\nMODEL: GPT-3 has 175 billion parameters and was trained on diverse internet text including Common Crawl, WebText2, Books1, Books2, and Wikipedia.\n\nRESULTS: GPT-3 achieves strong performance on many NLP datasets in the few-shot learning setting.",
+      "year": 2020,
+      "authors": ["Tom Brown", "Benjamin Mann", "Nick Ryder"],
+      "access_level": "full_text"
+    },
+    "vaswani2017": {
+      "id": "vaswani2017",
+      "title": "Attention is All You Need",
+      "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose a new architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "full_text": "ABSTRACT: We propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output.\n\nINTRODUCTION: Recurrent models typically factor computation along the symbol positions of the input and output sequences, which inherently sequential nature precludes parallelization.\n\nMODEL ARCHITECTURE: The Transformer uses stacked self-attention and point-wise, fully connected layers for both encoder and decoder. Multi-head attention allows the model to jointly attend to information from different representation subspaces.\n\nRESULTS: Our model achieves state-of-the-art performance on English-to-German and English-to-French translation tasks.",
+      "year": 2017,
+      "authors": ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar"],
+      "access_level": "full_text"
+    },
+    "he2016": {
+      "id": "he2016",
+      "title": "Deep Residual Learning for Image Recognition",
+      "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions.",
+      "full_text": "ABSTRACT: We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously.\n\nINTRODUCTION: Deep networks naturally integrate low/mid/high-level features and classifiers in an end-to-end multi-layer fashion.\n\nRESULTS: We evaluate our approach on ImageNet 2015 classification challenge. Our 152-layer ResNet achieves 3.57% top-5 error rate on the ImageNet test set, winning first place in the ILSVRC 2015 classification competition.\n\nCONCLUSION: The residual learning principle is generic and applicable to various vision recognition tasks.",
+      "year": 2016,
+      "authors": ["Kaiming He", "Xiangyu Zhang", "Shaoqing Ren"],
+      "access_level": "full_text"
+    },
+    "srivastava2014": {
+      "id": "srivastava2014",
+      "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+      "abstract": "Deep neural nets with a large number of parameters are very powerful machine learning systems. However, overfitting is a serious problem in such networks. Large networks are also slow to use. Dropout is a technique for addressing this problem.",
+      "full_text": "ABSTRACT: We propose dropout, a simple and effective technique for preventing overfitting in neural networks.\n\nINTRODUCTION: With dropout, neural network units are randomly dropped along with their connections during training. This prevents units from co-adapting too much.\n\nMETHOD: During training, dropout samples from an exponential number of different thinned networks. At test time, we use a single unthinned network with weighted connections to approximate the effect of averaging the predictions of all the thinned networks.\n\nRESULTS: Dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification, and computational biology.",
+      "year": 2014,
+      "authors": ["Nitish Srivastava", "Geoffrey Hinton", "Alex Krizhevsky"],
+      "access_level": "full_text"
+    }
+  },
+  "ground_truth": [
+    {
+      "claim_id": "claim_001",
+      "true_support_score": 1.0,
+      "reasoning": "Paper explicitly states 'BERT-Large achieves 93.2% accuracy on the overall GLUE score' in the Results section.",
+      "primary_evidence_paper": "devlin2019",
+      "key_concepts": ["glue", "93.2%", "accuracy"],
+      "has_citation_drift": false,
+      "drift_chain": null
+    },
+    {
+      "claim_id": "claim_002",
+      "true_support_score": 0.0,
+      "reasoning": "Paper states GPT-3 has 175 billion parameters, NOT over 200 billion. This is an overclaim.",
+      "primary_evidence_paper": "brown2020",
+      "key_concepts": ["175 billion", "parameters", "not 200"],
+      "has_citation_drift": false,
+      "drift_chain": null
+    },
+    {
+      "claim_id": "claim_003",
+      "true_support_score": 1.0,
+      "reasoning": "Paper explicitly describes Transformer as 'relying entirely on an attention mechanism' and details self-attention in the Model Architecture section.",
+      "primary_evidence_paper": "vaswani2017",
+      "key_concepts": ["self-attention", "attention mechanism", "transformer"],
+      "has_citation_drift": false,
+      "drift_chain": null
+    },
+    {
+      "claim_id": "claim_004",
+      "true_support_score": 0.9,
+      "reasoning": "Paper states 3.57% top-5 error rate, not 3.6%. Very close (rounding) but not exact match. Mostly supported.",
+      "primary_evidence_paper": "he2016",
+      "key_concepts": ["3.57%", "imagenet", "2015"],
+      "has_citation_drift": false,
+      "drift_chain": null
+    },
+    {
+      "claim_id": "claim_005",
+      "true_support_score": 1.0,
+      "reasoning": "Paper clearly states 'neural network units are randomly dropped during training' to prevent overfitting.",
+      "primary_evidence_paper": "srivastava2014",
+      "key_concepts": ["randomly", "dropped", "training", "overfitting"],
+      "has_citation_drift": false,
+      "drift_chain": null
+    }
+  ]
+}

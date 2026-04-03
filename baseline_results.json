@@ -1,0 +1,57 @@
+{
+  "model": "claude-3-5-sonnet-20241022",
+  "timestamp": "2026-04-03T16:39:51",
+  "elapsed_seconds": 67.55,
+  "results": [
+    {
+      "task": "easy",
+      "final_score": 0.412,
+      "total_reward": 1.5999999999999999,
+      "steps": 10,
+      "llm_calls": 0,
+      "grading_breakdown": {
+        "claim_001": {
+          "gt_support_score": 1.0,
+          "agent_support_score": 0.5,
+          "accuracy_component": 0.3,
+          "reasoning_component": 0.0,
+          "drift_component": 0.1,
+          "total": 0.4
+        },
+        "claim_002": {
+          "gt_support_score": 0.0,
+          "agent_support_score": 0.5,
+          "accuracy_component": 0.3,
+          "reasoning_component": 0.0,
+          "drift_component": 0.1,
+          "total": 0.4
+        },
+        "claim_003": {
+          "gt_support_score": 1.0,
+          "agent_support_score": 0.5,
+          "accuracy_component": 0.3,
+          "reasoning_component": 0.0,
+          "drift_component": 0.1,
+          "total": 0.4
+        },
+        "claim_004": {
+          "gt_support_score": 0.9,
+          "agent_support_score": 0.5,
+          "accuracy_component": 0.36,
+          "reasoning_component": 0.0,
+          "drift_component": 0.1,
+          "total": 0.46
+        },
+        "claim_005": {
+          "gt_support_score": 1.0,
+          "agent_support_score": 0.5,
+          "accuracy_component": 0.3,
+          "reasoning_component": 0.0,
+          "drift_component": 0.1,
+          "total": 0.4
+        }
+      }
+    }
+  ],
+  "average_final_score": 0.412
+}

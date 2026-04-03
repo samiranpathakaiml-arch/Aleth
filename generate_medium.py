@@ -1,0 +1,475 @@
+"""
+Generates aleth/data/task_medium.json programmatically.
+Run once: python generate_medium.py
+"""
+import json, pathlib
+
+# ---------------------------------------------------------------------------
+# PAPERS  (access_level: 3 abstract_only, 1 unavailable, rest full_text)
+# ---------------------------------------------------------------------------
+papers = {
+    "goodfellow2014": {
+        "id": "goodfellow2014",
+        "title": "Generative Adversarial Nets",
+        "abstract": (
+            "We propose a new framework for estimating generative models via an adversarial "
+            "process, in which we simultaneously train two models: a generative model G that "
+            "captures the data distribution, and a discriminative model D that estimates the "
+            "probability that a sample came from the training data rather than G. The training "
+            "procedure for G is to maximise the probability of D making a mistake."
+        ),
+        "full_text": (
+            "ABSTRACT: We propose training a generative model G and discriminator D in "
+            "a minimax game: min_G max_D V(D,G) = E[log D(x)] + E[log(1 - D(G(z)))].\n\n"
+            "INTRODUCTION: Deep generative models have had less impact due to difficulties "
+            "approximating intractable probabilistic computations. We sidestep these by "
+            "training adversarially.\n\n"
+            "MODEL: G maps noise z ~ p_z(z) to data space. D outputs a scalar probability. "
+            "G is trained to fool D; D is trained to distinguish real from generated samples.\n\n"
+            "RESULTS: We trained adversarial nets on MNIST, CIFAR-10, and the Toronto Face "
+            "Database. Qualitative and quantitative evaluations show competitive results.\n\n"
+            "CONCLUSION: The adversarial framework opens new research directions for generative "
+            "modelling without explicit density estimation."
+        ),
+        "year": 2014,
+        "authors": ["Ian Goodfellow", "Jean Pouget-Abadie", "Mehdi Mirza", "Bing Xu"],
+        "access_level": "full_text",
+    },
+    "ioffe2015": {
+        "id": "ioffe2015",
+        "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+        "abstract": (
+            "Training Deep Neural Networks is complicated by the fact that the distribution of "
+            "each layer's inputs changes during training, as the parameters of the previous layers "
+            "change. This slows training by requiring lower learning rates and careful parameter "
+            "initialization. We refer to this phenomenon as internal covariate shift. We address "
+            "this by normalizing layer inputs."
+        ),
+        "full_text": (
+            "ABSTRACT: We address internal covariate shift by normalizing layer inputs, "
+            "a technique we call Batch Normalization (BN). BN allows higher learning rates, "
+            "reduces dependence on initialization, and acts as a regularizer.\n\n"
+            "METHOD: For a mini-batch B = {x_1..m}, compute mean mu_B and variance sigma_B^2, "
+            "then normalize: x_hat_i = (x_i - mu_B) / sqrt(sigma_B^2 + eps). "
+            "Scale and shift: y_i = gamma * x_hat_i + beta.\n\n"
+            "RESULTS: BN-Inception trained with Batch Normalization achieves the same accuracy "
+            "as the baseline model in 14x fewer training steps. With an ensemble of BN networks "
+            "we surpass the previous best ImageNet top-5 accuracy of 93.8%.\n\n"
+            "CONCLUSION: Batch Normalization resolves internal covariate shift and allows the "
+            "use of much higher learning rates, enabling faster and more stable training."
+        ),
+        "year": 2015,
+        "authors": ["Sergey Ioffe", "Christian Szegedy"],
+        "access_level": "full_text",
+    },
+    # --- abstract_only #1 ---
+    "hochreiter1997": {
+        "id": "hochreiter1997",
+        "title": "Long Short-Term Memory",
+        "abstract": (
+            "Learning to store information over extended time intervals by recurrent backpropagation "
+            "takes a very long time, mostly because of insufficient, decaying error backflow. "
+            "We briefly review Hochreiter's analysis of this problem and then propose a novel, "
+            "efficient, gradient-based method called Long Short-Term Memory (LSTM). Truncating the "
+            "gradient where this does not do harm, LSTM can learn to bridge minimal time lags in "
+            "excess of 1000 discrete time steps by enforcing constant error flow through constant "
+            "error carousels within special units. Multiplicative gate units learn to open and close "
+            "access to the constant error flow. LSTM uses three gates — input, forget, and output — "
+            "to selectively retain or discard information across time steps, and is local in space "
+            "and time."
+        ),
+        "full_text": None,
+        "year": 1997,
+        "authors": ["Sepp Hochreiter", "Juergen Schmidhuber"],
+        "access_level": "abstract_only",
+    },
+    "mikolov2013word": {
+        "id": "mikolov2013word",
+        "title": "Distributed Representations of Words and Phrases and their Compositionality",
+        "abstract": (
+            "The recently introduced continuous Skip-gram model is an efficient method for learning "
+            "high-quality distributed vector representations that capture a large number of precise "
+            "syntactic and semantic word relationships. In this paper we present several extensions "
+            "that improve both the quality of the vectors and the training speed. "
+            "These representations are shown to exhibit arithmetic properties: "
+            "vector('King') - vector('Man') + vector('Woman') results in a vector "
+            "closest to vector('Queen'), a property not present in Bengio et al. (2003)."
+        ),
+        "full_text": (
+            "ABSTRACT: We introduce Skip-gram and CBOW architectures that train shallow neural "
+            "networks to predict context words, learning dense word representations.\n\n"
+            "MODEL: Skip-gram maximizes the log probability of context words given the centre word. "
+            "CBOW predicts the centre word from context. Both are trained with negative sampling.\n\n"
+            "VECTOR ARITHMETIC: The learned word vectors exhibit remarkable arithmetic properties. "
+            "A key example: vector('King') - vector('Man') + vector('Woman') is closest to "
+            "vector('Queen'). This semantic compositionality was first demonstrated in this work "
+            "and is NOT present in Bengio et al. (2003), which introduced word embeddings for "
+            "language modelling but did not explore vector arithmetic.\n\n"
+            "RESULTS: On a word analogy test covering semantic and syntactic relationships, "
+            "Skip-gram achieves 55% accuracy, substantially outperforming prior methods.\n\n"
+            "CONCLUSION: Shallow neural networks trained on large corpora produce word vectors "
+            "with rich semantic and syntactic structure."
+        ),
+        "year": 2013,
+        "authors": ["Tomas Mikolov", "Ilya Sutskever", "Kai Chen", "Greg Corrado", "Jeffrey Dean"],
+        "access_level": "full_text",
+    },
+    # --- abstract_only #2 ---
+    "radford2019": {
+        "id": "radford2019",
+        "title": "Language Models are Unsupervised Multitask Learners",
+        "abstract": (
+            "Natural language processing tasks, such as question answering, machine translation, "
+            "reading comprehension, and summarization, are typically approached with supervised "
+            "learning on task-specific datasets. We demonstrate that language models begin to learn "
+            "these tasks without any explicit supervision when trained on a new dataset of millions "
+            "of webpages called WebText, which contains approximately 40 GB of text. Our largest "
+            "model, GPT-2, has 1.5 billion parameters and achieves state of the art results on 7 "
+            "of 8 tested language modeling datasets in a zero-shot setting."
+        ),
+        "full_text": None,
+        "year": 2019,
+        "authors": ["Alec Radford", "Jeffrey Wu", "Rewon Child", "David Luan", "Dario Amodei", "Ilya Sutskever"],
+        "access_level": "abstract_only",
+    },
+    "sutskever2014": {
+        "id": "sutskever2014",
+        "title": "Sequence to Sequence Learning with Neural Networks",
+        "abstract": (
+            "Deep Neural Networks are powerful models that have achieved excellent performance on "
+            "difficult learning tasks. Despite their flexibility and power, however, DNNs can only "
+            "be applied to problems whose inputs and targets can be sensibly encoded with vectors "
+            "of fixed dimensionality. We present a general end-to-end approach to sequence learning "
+            "that makes minimal assumptions on the sequence structure."
+        ),
+        "full_text": (
+            "ABSTRACT: We propose a sequence-to-sequence (seq2seq) framework using two LSTM "
+            "networks: an encoder that reads the input sequence into a fixed-length vector, and "
+            "a decoder that generates the output sequence from that vector.\n\n"
+            "ARCHITECTURE: The encoder LSTM reads the input word by word, producing a final "
+            "hidden state that summarises the entire input. The decoder LSTM is then initialised "
+            "with this hidden state and generates the target sequence token by token.\n\n"
+            "KEY TRICK: Reversing the input sequence significantly improves BLEU scores, "
+            "likely because it shortens the path between corresponding words.\n\n"
+            "LIMITATION: The encoder compresses the entire input into a single fixed-length vector, "
+            "which becomes a bottleneck for long sequences. This bottleneck was later addressed "
+            "by Bahdanau et al. (2015) with attention mechanisms.\n\n"
+            "RESULTS: Achieves 34.8 BLEU on WMT English-to-French, competitive with phrase-based SMT."
+        ),
+        "year": 2014,
+        "authors": ["Ilya Sutskever", "Oriol Vinyals", "Quoc V. Le"],
+        "access_level": "full_text",
+    },
+    "bahdanau2015": {
+        "id": "bahdanau2015",
+        "title": "Neural Machine Translation by Jointly Learning to Align and Translate",
+        "abstract": (
+            "Neural machine translation is a recently proposed approach to machine translation. "
+            "Unlike the traditional statistical machine translation, the neural machine translation "
+            "aims at building a single neural network that can be jointly tuned to maximize the "
+            "translation performance. We conjecture that the use of a fixed-length vector is a "
+            "bottleneck in improving the performance of this basic encoder-decoder architecture, "
+            "and propose to extend this by allowing a model to automatically (soft-)search for "
+            "parts of a source sentence that are relevant to predicting a target word, without "
+            "having to form these parts as a hard segment explicitly."
+        ),
+        "full_text": (
+            "ABSTRACT: We propose an attention mechanism that solves the fixed-length bottleneck "
+            "in encoder-decoder models by allowing the decoder to look back at encoder hidden states.\n\n"
+            "ATTENTION MECHANISM: At each decode step i, a context vector c_i is computed as a "
+            "weighted sum of encoder hidden states: c_i = sum_j alpha_ij * h_j. "
+            "The alignment weight alpha_ij = softmax(e_ij) where e_ij = a(s_{i-1}, h_j) is an "
+            "alignment model scoring how well inputs around position j match the output at position i.\n\n"
+            "KEY INSIGHT: The decoder dynamically attends to different encoder hidden states at each "
+            "step rather than relying on a single bottleneck vector. This is a direct solution to "
+            "the limitation identified in Sutskever et al. (2014).\n\n"
+            "RESULTS: On WMT English-to-French, the attention model significantly outperforms the "
+            "basic encoder-decoder for long sentences and achieves near phrase-based SMT performance."
+        ),
+        "year": 2015,
+        "authors": ["Dzmitry Bahdanau", "Kyunghyun Cho", "Yoshua Bengio"],
+        "access_level": "full_text",
+    },
+    "krizhevsky2012": {
+        "id": "krizhevsky2012",
+        "title": "ImageNet Classification with Deep Convolutional Neural Networks",
+        "abstract": (
+            "We trained a large, deep convolutional neural network to classify the 1.2 million "
+            "high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different "
+            "classes. The neural network, which has 60 million parameters and 650,000 neurons, "
+            "consists of five convolutional layers, some of which are followed by max-pooling "
+            "layers, and three fully-connected layers with a final 1000-way softmax."
+        ),
+        "full_text": (
+            "ABSTRACT: AlexNet, a deep CNN with 60M parameters, won ILSVRC-2012 with 15.3% "
+            "top-5 error, far ahead of second place at 26.2%.\n\n"
+            "RELU ACTIVATIONS: We used Rectified Linear Units (ReLUs) as nonlinearities. "
+            "Networks with ReLUs train several times faster than equivalent networks with "
+            "tanh units; a four-layer CNN with ReLUs reaches 25% training error on CIFAR-10 "
+            "six times faster than an equivalent tanh network.\n\n"
+            "DROPOUT: To reduce overfitting in the fully-connected layers, we employed dropout "
+            "with probability 0.5. At test time all neurons are used but outputs are multiplied "
+            "by 0.5. Without dropout the network exhibits substantially more overfitting.\n\n"
+            "CONCLUSION: The combination of ReLU activations for speed and dropout for "
+            "regularization were both critical to AlexNet's winning performance on ImageNet."
+        ),
+        "year": 2012,
+        "authors": ["Alex Krizhevsky", "Ilya Sutskever", "Geoffrey E. Hinton"],
+        "access_level": "full_text",
+    },
+    "srivastava2014": {
+        "id": "srivastava2014",
+        "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+        "abstract": (
+            "Deep neural nets with a large number of parameters are very powerful machine learning "
+            "systems. However, overfitting is a serious problem in such networks. Dropout is a "
+            "technique for addressing this problem. The key idea is to randomly drop units along "
+            "with their connections from the neural network during training."
+        ),
+        "full_text": (
+            "ABSTRACT: Dropout prevents overfitting by randomly dropping units during training.\n\n"
+            "METHOD: During training, each unit is retained with probability p (typically 0.5 for "
+            "hidden units). At test time, weights are scaled by p to approximate the average of "
+            "the exponential number of thinned networks.\n\n"
+            "RESULTS: Dropout improves performance on MNIST, CIFAR-10, ImageNet, and speech "
+            "recognition tasks. It reduces test error substantially and is especially effective "
+            "when combined with max-norm regularization."
+        ),
+        "year": 2014,
+        "authors": ["Nitish Srivastava", "Geoffrey Hinton", "Alex Krizhevsky"],
+        "access_level": "full_text",
+    },
+    # --- abstract_only #3 ---
+    "he2016": {
+        "id": "he2016",
+        "title": "Deep Residual Learning for Image Recognition",
+        "abstract": (
+            "Deeper neural networks are more difficult to train. We present a residual learning "
+            "framework to ease the training of networks that are substantially deeper than those "
+            "used previously. We explicitly reformulate the layers as learning residual functions "
+            "with reference to the layer inputs, instead of learning unreferenced functions. "
+            "We provide comprehensive empirical evidence showing that these residual networks are "
+            "easier to optimize, and can gain accuracy from considerably increased depth. "
+            "On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers — "
+            "8x deeper than VGG nets but having lower complexity. Residual connections allow "
+            "gradients to flow unimpeded through very deep networks, enabling training of networks "
+            "with over 100 layers."
+        ),
+        "full_text": None,
+        "year": 2016,
+        "authors": ["Kaiming He", "Xiangyu Zhang", "Shaoqing Ren", "Jian Sun"],
+        "access_level": "abstract_only",
+    },
+    "kingma2014adam": {
+        "id": "kingma2014adam",
+        "title": "Adam: A Method for Stochastic Optimization",
+        "abstract": (
+            "We introduce Adam, an algorithm for first-order gradient-based optimization of "
+            "stochastic objective functions, based on adaptive estimates of lower-order moments. "
+            "The method computes adaptive learning rates for each parameter using exponentially "
+            "decaying averages of past gradients (first moment) and past squared gradients "
+            "(second moment)."
+        ),
+        "full_text": (
+            "ABSTRACT: Adam computes per-parameter adaptive learning rates from estimates of "
+            "first and second moments of gradients.\n\n"
+            "ALGORITHM: At step t, compute: m_t = beta1*m_{t-1} + (1-beta1)*g_t  (first moment), "
+            "v_t = beta2*v_{t-1} + (1-beta2)*g_t^2  (second moment). "
+            "Bias-correct: m_hat = m_t/(1-beta1^t), v_hat = v_t/(1-beta2^t). "
+            "Update: theta_t = theta_{t-1} - alpha * m_hat / (sqrt(v_hat) + eps).\n\n"
+            "DEFAULT HYPERPARAMETERS: alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-8.\n\n"
+            "RESULTS: Adam outperforms SGD, AdaGrad, and RMSProp on logistic regression, "
+            "neural networks, and convolutional architectures."
+        ),
+        "year": 2014,
+        "authors": ["Diederik P. Kingma", "Jimmy Ba"],
+        "access_level": "full_text",
+    },
+    # --- unavailable #1 ---
+    "silver2016": {
+        "id": "silver2016",
+        "title": "Mastering the Game of Go with Deep Neural Networks and Tree Search",
+        "abstract": (
+            "The game of Go has long been viewed as the most challenging of classic games for "
+            "artificial intelligence owing to its enormous search space and the difficulty of "
+            "evaluating board positions and moves. Here we introduce a new approach to computer Go "
+            "that uses value networks to evaluate board positions and policy networks to select moves. "
+            "AlphaGo defeated the European Go champion Fan Hui 5-0 and world champion Lee Sedol 4-1."
+        ),
+        "full_text": None,
+        "year": 2016,
+        "authors": ["David Silver", "Aja Huang", "Chris J. Maddison", "Arthur Guez", "Laurent Sifre"],
+        "access_level": "unavailable",
+    },
+    "bengio2003": {
+        "id": "bengio2003",
+        "title": "A Neural Probabilistic Language Model",
+        "abstract": (
+            "A goal of statistical language modeling is to learn the joint probability function "
+            "of sequences of words in a language. We propose to fight the curse of dimensionality "
+            "by learning a distributed representation for words which allows each training sentence "
+            "to inform the model about an exponential number of semantically neighboring sentences."
+        ),
+        "full_text": (
+            "ABSTRACT: We propose a neural language model that learns a distributed representation "
+            "for each word (a word feature vector) as part of the language model training.\n\n"
+            "MODEL: The joint probability of a word sequence is expressed as a product of "
+            "conditional probabilities. A neural network maps word indices to continuous feature "
+            "vectors (embeddings) and uses them to predict the next word.\n\n"
+            "WORD REPRESENTATIONS: The model learns word feature vectors as a by-product of "
+            "maximizing log-likelihood of the training corpus. These vectors encode semantic "
+            "similarity. However, the paper does NOT demonstrate arithmetic operations on vectors "
+            "such as king - man + woman = queen; that property was first shown by Mikolov et al. (2013).\n\n"
+            "RESULTS: The model achieves lower perplexity than n-gram models on the Brown corpus.\n\n"
+            "CONCLUSION: Distributed representations of words can be learned as a side effect of "
+            "language model training."
+        ),
+        "year": 2003,
+        "authors": ["Yoshua Bengio", "Rejean Ducharme", "Pascal Vincent", "Christian Jauvin"],
+        "access_level": "full_text",
+    },
+    "vaswani2017": {
+        "id": "vaswani2017",
+        "title": "Attention Is All You Need",
+        "abstract": (
+            "The dominant sequence transduction models are based on complex recurrent or convolutional "
+            "neural networks that include an encoder and a decoder. We propose a new simple network "
+            "architecture, the Transformer, based solely on attention mechanisms, dispensing with "
+            "recurrence and convolutions entirely."
+        ),
+        "full_text": (
+            "ABSTRACT: The Transformer relies entirely on self-attention and achieves state-of-the-art "
+            "translation results with significantly less training time.\n\n"
+            "COMPLEXITY COMPARISON (Table 1): Self-attention layers connect all positions with O(1) "
+            "sequential operations. Recurrent layers (like LSTM) require O(n) sequential operations, "
+            "where n is the sequence length. This makes self-attention better at capturing long-range "
+            "dependencies because the path between any two positions is shorter.\n\n"
+            "RESULTS: Big Transformer achieves 28.4 BLEU on WMT 2014 EN-DE, surpassing all prior "
+            "models including ensembles. Training takes 3.5 days on 8 GPUs vs weeks for RNN models."
+        ),
+        "year": 2017,
+        "authors": ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar", "Jakob Uszkoreit"],
+        "access_level": "full_text",
+    },
+    "brown2020": {
+        "id": "brown2020",
+        "title": "Language Models are Few-Shot Learners",
+        "abstract": (
+            "We train GPT-3, an autoregressive language model with 175 billion parameters, and "
+            "test its performance in the few-shot and zero-shot setting. GPT-3 achieves strong "
+            "results on many NLP tasks, often matching fine-tuned models, without any gradient "
+            "updates or fine-tuning. Pre-training on diverse internet data enables zero-shot task "
+            "transfer across a wide range of language tasks."
+        ),
+        "full_text": (
+            "ABSTRACT: GPT-3 has 175 billion parameters and demonstrates that pre-training on "
+            "diverse internet data enables zero-shot task performance.\n\n"
+            "ZERO-SHOT: GPT-3 is given only a task description and performs the task directly, "
+            "with no gradient updates. This extends the zero-shot finding of GPT-2 to a much "
+            "larger scale and wider range of tasks.\n\n"
+            "PRE-TRAINING DATA: GPT-3 was trained on a filtered version of Common Crawl, "
+            "WebText2, Books1, Books2, and Wikipedia — diverse internet-scale data.\n\n"
+            "RESULTS: On SuperGLUE, GPT-3 zero-shot scores 71.8%, few-shot 76.4%, approaching "
+            "fine-tuned BERT-Large."
+        ),
+        "year": 2020,
+        "authors": ["Tom Brown", "Benjamin Mann", "Nick Ryder", "Melanie Subbiah"],
+        "access_level": "full_text",
+    },
+    "mnih2015": {
+        "id": "mnih2015",
+        "title": "Human-level control through deep reinforcement learning",
+        "abstract": (
+            "We present the first deep learning model to successfully learn control policies "
+            "directly from high-dimensional sensory input using reinforcement learning. The model "
+            "is a convolutional neural network, trained with a variant of Q-learning, whose input "
+            "is raw pixels and whose output is a value function estimating future rewards."
+        ),
+        "full_text": (
+            "ABSTRACT: Deep Q-Network (DQN) achieves human-level performance on 49 Atari games "
+            "using raw pixel input, by combining CNNs with Q-learning.\n\n"
+            "KEY INNOVATIONS:\n"
+            "1. Experience replay: stores transitions (s,a,r,s') in a replay buffer and samples "
+            "random mini-batches for training, breaking correlations between sequential observations.\n"
+            "2. Target network: a separate network with frozen parameters provides stable Q-value "
+            "targets, updated every C steps.\n\n"
+            "RESULTS: DQN surpasses human performance on 29 of 49 Atari 2600 games and achieves "
+            "human-level or better performance on 49 games overall. Previous RL methods could only "
+            "handle low-dimensional state spaces.\n\n"
+            "CONCLUSION: Combining CNNs, experience replay, and a target network overcomes the "
+            "instability of naive Q-learning with neural network function approximators."
+        ),
+        "year": 2015,
+        "authors": ["Volodymyr Mnih", "Koray Kavukcuoglu", "David Silver", "Andrei A. Rusu"],
+        "access_level": "full_text",
+    },
+}
+
+# ---------------------------------------------------------------------------
+# CLAIMS  (15 total; 5 multi-citation, 1 drift)
+# ---------------------------------------------------------------------------
+claims = [
+    {"id": "claim_m01", "text": "GANs consist of a generator and discriminator trained via an adversarial minimax game", "citations": ["goodfellow2014"], "context": "Generative modelling advanced rapidly after GANs were introduced. GANs consist of a generator and discriminator trained via an adversarial minimax game where G tries to fool D.", "claim_type": "methodological"},
+    {"id": "claim_m02", "text": "Batch Normalization reduces internal covariate shift and enables the use of higher learning rates during training", "citations": ["ioffe2015"], "context": "Training instability in deep networks was addressed by normalization. Batch Normalization reduces internal covariate shift and enables the use of higher learning rates during training.", "claim_type": "methodological"},
+    {"id": "claim_m03", "text": "LSTM networks use input, forget, and output gates to selectively retain or discard information across time steps", "citations": ["hochreiter1997"], "context": "Vanilla RNNs failed to learn long-range dependencies. LSTM networks use input, forget, and output gates to selectively retain or discard information across time steps.", "claim_type": "methodological"},
+    {"id": "claim_m04", "text": "Word2Vec learns word representations by training a shallow neural network to predict context words via Skip-gram or CBOW objectives", "citations": ["mikolov2013word"], "context": "Dense word representations became foundational for NLP. Word2Vec learns word representations by training a shallow neural network to predict context words via Skip-gram or CBOW objectives.", "claim_type": "methodological"},
+    {"id": "claim_m05", "text": "GPT-2 was trained on WebText, a dataset of approximately 40 GB of internet text, and achieves zero-shot state-of-the-art on 7 of 8 language modeling benchmarks", "citations": ["radford2019"], "context": "The scale of pre-training data became decisive. GPT-2 was trained on WebText, approximately 40 GB of internet text, achieving zero-shot state-of-the-art on 7 of 8 language modeling benchmarks.", "claim_type": "empirical"},
+    # SYNTHESIS ×5
+    {"id": "claim_m06", "text": "Large-scale pre-training on diverse internet data enables language models to perform downstream tasks in a zero-shot setting without any gradient updates", "citations": ["radford2019", "brown2020"], "context": "Zero-shot generalisation was a major milestone. Both GPT-2 and GPT-3 demonstrate that pre-training on internet-scale data allows zero-shot task performance without fine-tuning.", "claim_type": "empirical"},
+    {"id": "claim_m07", "text": "Attention mechanisms for neural machine translation allow the decoder to dynamically attend to different encoder hidden states at each decoding step, overcoming the fixed-length bottleneck", "citations": ["sutskever2014", "bahdanau2015"], "context": "Neural MT improved significantly with attention. Bahdanau et al. proposed attention as a direct fix to the fixed-length bottleneck identified in the Sutskever et al. seq2seq model.", "claim_type": "methodological"},
+    {"id": "claim_m08", "text": "AlexNet's winning ImageNet 2012 performance was driven by both ReLU activations, which accelerated training, and dropout regularization, which reduced overfitting", "citations": ["krizhevsky2012", "srivastava2014"], "context": "AlexNet's success on ImageNet 2012 depended on multiple innovations. Both ReLU activations and dropout regularization were explicitly identified as key contributors.", "claim_type": "empirical"},
+    {"id": "claim_m12", "text": "Both Bengio et al. (2003) and Mikolov et al. (2013) show that language models learn distributed word representations as a byproduct of next-word prediction training", "citations": ["bengio2003", "mikolov2013word"], "context": "Distributed word representations emerged from language modelling objectives across two influential papers. Both Bengio (2003) and Mikolov (2013) confirmed this finding.", "claim_type": "theoretical"},
+    {"id": "claim_m14", "text": "The Transformer's self-attention connects all positions in O(1) sequential operations, compared to O(n) for RNNs, making it better at capturing long-range dependencies", "citations": ["vaswani2017", "hochreiter1997"], "context": "Architectural complexity analysis motivated the Transformer design. Vaswani et al. explicitly benchmark self-attention versus recurrent layers in terms of sequential operations per layer.", "claim_type": "theoretical"},
+    # Single-citation claims
+    {"id": "claim_m09", "text": "Residual connections allow gradients to flow unimpeded through very deep networks, enabling training of networks with over 100 layers", "citations": ["he2016"], "context": "Depth was a key bottleneck in neural network training. Residual connections let He et al. train 152-layer networks on ImageNet with lower error than shallower VGG nets.", "claim_type": "methodological"},
+    {"id": "claim_m10", "text": "The Adam optimizer computes adaptive per-parameter learning rates using exponentially decaying estimates of the first and second moments of past gradients", "citations": ["kingma2014adam"], "context": "Adaptive optimizers became standard for deep learning. Adam maintains first-moment and second-moment running averages, updating each parameter with its own learning rate.", "claim_type": "methodological"},
+    {"id": "claim_m11", "text": "AlphaGo defeated world Go champion Lee Sedol 4-1 in March 2016 using deep neural networks combined with Monte Carlo Tree Search", "citations": ["silver2016"], "context": "AI achieved a landmark in strategic game playing. AlphaGo combined deep policy and value networks with Monte Carlo Tree Search to defeat the human Go world champion.", "claim_type": "empirical"},
+    {"id": "claim_m13", "text": "Deep Q-Networks achieved human-level performance on 49 Atari games by combining convolutional neural networks with experience replay and a target network", "citations": ["mnih2015"], "context": "Deep reinforcement learning reached human parity on Atari. DQN used a replay buffer and a frozen target network to stabilise Q-learning with CNN function approximators.", "claim_type": "empirical"},
+    # DRIFT claim
+    {"id": "claim_m15", "text": "The semantic word arithmetic property—such as king minus man plus woman equals queen—was first demonstrated by Bengio et al. in their 2003 neural language model paper", "citations": ["mikolov2013word"], "context": "The geometric structure of word embeddings is widely cited. The arithmetic relationship between word vectors is attributed by some authors back to the foundational 2003 neural LM paper.", "claim_type": "empirical"},
+]
+
+# ---------------------------------------------------------------------------
+# GROUND TRUTH
+# ---------------------------------------------------------------------------
+ground_truth = [
+    {"claim_id": "claim_m01", "true_support_score": 1.0, "reasoning": "Goodfellow et al. explicitly define the minimax objective V(D,G) = E[log D(x)] + E[log(1-D(G(z)))] and describe the adversarial training process.", "primary_evidence_paper": "goodfellow2014", "key_concepts": ["generator", "discriminator", "minimax", "adversarial"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m02", "true_support_score": 1.0, "reasoning": "Ioffe and Szegedy explicitly name 'internal covariate shift' as the problem and show BN allows much higher learning rates, with a 14x speedup demonstrated.", "primary_evidence_paper": "ioffe2015", "key_concepts": ["internal covariate shift", "higher learning rates", "batch normalization"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m03", "true_support_score": 1.0, "reasoning": "The LSTM abstract explicitly names the input gate, forget gate, and output gate as multiplicative gate units that selectively retain or discard information.", "primary_evidence_paper": "hochreiter1997", "key_concepts": ["input gate", "forget gate", "output gate", "selectively retain"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m04", "true_support_score": 1.0, "reasoning": "Mikolov et al. describe both Skip-gram and CBOW as shallow neural networks trained to predict context words, producing distributed word representations.", "primary_evidence_paper": "mikolov2013word", "key_concepts": ["skip-gram", "cbow", "context words", "distributed representations"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m05", "true_support_score": 1.0, "reasoning": "The GPT-2 abstract explicitly states WebText contains approximately 40 GB of text and that GPT-2 achieves state-of-the-art on 7 of 8 language modelling benchmarks in a zero-shot setting.", "primary_evidence_paper": "radford2019", "key_concepts": ["WebText", "40 GB", "zero-shot", "7 of 8"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m06", "true_support_score": 1.0, "reasoning": "GPT-2 (Radford 2019) demonstrates zero-shot task performance from large-scale web pre-training. GPT-3 (Brown 2020) explicitly states that pre-training on diverse internet data enables zero-shot performance without gradient updates. Both papers support the claim.", "primary_evidence_paper": "radford2019", "key_concepts": ["zero-shot", "pre-training", "internet data", "no gradient updates"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m07", "true_support_score": 1.0, "reasoning": "Bahdanau et al. define context vector c_i as a weighted sum of encoder hidden states, with alignment weights computed dynamically at each decode step. Sutskever et al. provide the base seq2seq framework whose fixed-length bottleneck attention solves.", "primary_evidence_paper": "bahdanau2015", "key_concepts": ["context vector", "encoder hidden states", "alignment", "dynamic", "bottleneck"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m08", "true_support_score": 1.0, "reasoning": "Krizhevsky et al. explicitly state ReLUs train 6x faster than tanh and that dropout prevents substantial overfitting in the FC layers. Both factors are credited as key to AlexNet's ImageNet 2012 victory.", "primary_evidence_paper": "krizhevsky2012", "key_concepts": ["ReLU", "dropout", "ImageNet", "overfitting", "training speed"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m09", "true_support_score": 1.0, "reasoning": "The ResNet abstract explicitly states residual connections allow gradient flow and enables training up to 152 layers (well over 100), winning ILSVRC 2015.", "primary_evidence_paper": "he2016", "key_concepts": ["residual connections", "gradient flow", "152 layers", "over 100 layers"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m10", "true_support_score": 1.0, "reasoning": "Kingma and Ba define m_t (first moment / mean) and v_t (second moment / uncentered variance) as exponentially decaying averages, which drive per-parameter adaptive learning rates via theta update rule.", "primary_evidence_paper": "kingma2014adam", "key_concepts": ["first moment", "second moment", "adaptive", "per-parameter", "exponentially decaying"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m11", "true_support_score": 0.9, "reasoning": "AlphaGo did defeat Lee Sedol 4-1 in March 2016 using deep neural networks and MCTS (source is unavailable for direct text verification, but this is the widely documented result). Slight uncertainty due to inaccessibility.", "primary_evidence_paper": "silver2016", "key_concepts": ["Lee Sedol", "4-1", "Monte Carlo Tree Search", "deep neural networks"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m12", "true_support_score": 1.0, "reasoning": "Bengio (2003) trains word feature vectors as a side effect of neural LM training. Mikolov (2013) does the same via Skip-gram/CBOW. Both papers confirm distributed representations emerge from next-word prediction, supporting the synthesis claim.", "primary_evidence_paper": "bengio2003", "key_concepts": ["distributed representations", "language model", "next-word prediction", "word vectors"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m13", "true_support_score": 1.0, "reasoning": "Mnih et al. explicitly describe experience replay and a frozen target network as the two key innovations enabling stable Q-learning, and report human-level performance on 49 Atari games.", "primary_evidence_paper": "mnih2015", "key_concepts": ["experience replay", "target network", "49 Atari", "human-level", "convolutional"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m14", "true_support_score": 1.0, "reasoning": "Vaswani et al. Table 1 explicitly states self-attention has O(1) sequential operations vs O(n) for recurrent layers, and attributes the long-range dependency advantage to this difference. LSTM (Hochreiter 1997) is the canonical recurrent baseline.", "primary_evidence_paper": "vaswani2017", "key_concepts": ["O(1)", "sequential operations", "self-attention", "long-range", "recurrent"], "has_citation_drift": False, "drift_chain": None},
+    {"claim_id": "claim_m15", "true_support_score": 0.0, "reasoning": "The semantic arithmetic property (king - man + woman = queen) was demonstrated by Mikolov et al. (2013), NOT Bengio et al. (2003). Bengio introduced word embeddings for language modelling but did not demonstrate or describe vector arithmetic. The mikolov2013word paper itself explicitly notes this property is NOT present in Bengio 2003. This is a misattribution — citation drift from Mikolov 2013 backward to Bengio 2003.", "primary_evidence_paper": "mikolov2013word", "key_concepts": ["Mikolov", "2013", "not Bengio", "king minus man", "misattribution"], "has_citation_drift": True, "drift_chain": ["bengio2003", "mikolov2013word"]},
+]
+
+# ---------------------------------------------------------------------------
+# ASSEMBLE & WRITE
+# ---------------------------------------------------------------------------
+task = {
+    "task_id": "medium",
+    "max_steps": 100,
+    "claims": claims,
+    "papers": papers,
+    "ground_truth": ground_truth,
+}
+
+out = pathlib.Path("aleth/data/task_medium.json")
+out.write_text(json.dumps(task, indent=2, ensure_ascii=False), encoding="utf-8")
+print(f"Written {out}  ({out.stat().st_size:,} bytes)")
+print(f"Claims : {len(claims)}")
+print(f"Papers : {len(papers)}")
+print(f"  full_text    : {sum(1 for p in papers.values() if p['access_level'] == 'full_text')}")
+print(f"  abstract_only: {sum(1 for p in papers.values() if p['access_level'] == 'abstract_only')}")
+print(f"  unavailable  : {sum(1 for p in papers.values() if p['access_level'] == 'unavailable')}")
+multi = [c for c in claims if len(c["citations"]) >= 2]
+drift = [g for g in ground_truth if g["has_citation_drift"]]
+print(f"Multi-citation claims: {len(multi)}")
+print(f"Drift claims         : {len(drift)}")

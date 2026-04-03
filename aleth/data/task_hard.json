@@ -1,0 +1,1083 @@
+{
+  "task_id": "hard",
+  "max_steps": 150,
+  "claims": [
+    {
+      "id": "claim_h01",
+      "text": "Algorithmic bias in healthcare AI directly causes disparate health outcomes for minority patients.",
+      "citations": [
+        "obermeyer2019bias",
+        "shah2021bias",
+        "fda2021guidance"
+      ],
+      "context": "Healthcare AI systems have been scrutinised for fairness. Studies show algorithmic bias directly causes worse health outcomes for minority groups.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h02",
+      "text": "Using BioBERT on clinical notes directly causes improved patient outcomes in hospitals.",
+      "citations": [
+        "devlin2019bert_med",
+        "beam2018clinical",
+        "johnson2016mimic"
+      ],
+      "context": "NLP tools applied to EHRs are expected to improve care. BioBERT applied to clinical NLP directly causes improved patient outcomes.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h03",
+      "text": "Higher benchmark accuracy on ImageNet directly causes better diagnostic performance in real hospital deployments.",
+      "citations": [
+        "lecun1989",
+        "rajpurkar2017chexnet",
+        "zech2018pneumonia"
+      ],
+      "context": "ImageNet accuracy is used as a proxy for medical AI quality. Higher ImageNet accuracy directly causes better diagnostic outcomes in hospitals.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h04",
+      "text": "Screen time in patients correlating with poor health metrics proves that digital device usage directly causes cognitive decline.",
+      "citations": [
+        "shah2021bias",
+        "obermeyer2019bias",
+        "topol2019medicine"
+      ],
+      "context": "Observational studies identify correlates of cognitive decline. Device screen time directly causes cognitive decline based on the cited associations.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h05",
+      "text": "Deploying deep learning in radiology departments directly causes a reduction in radiologist workload and burnout.",
+      "citations": [
+        "rajpurkar2017chexnet",
+        "litjens2017survey",
+        "zech2018pneumonia"
+      ],
+      "context": "AI adoption in radiology is expected to change workflows. Deep learning deployment in radiology directly causes reduced radiologist workload.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h06",
+      "text": "Cardiovascular risk score improvement observed in ML studies proves that deploying these models directly causes fewer cardiac events in populations.",
+      "citations": [
+        "weng2017cardio",
+        "topol2019medicine",
+        "who2021ethics"
+      ],
+      "context": "ML cardiovascular risk tools have shown improved metrics. Improved risk scores directly cause fewer cardiac events when deployed.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h07",
+      "text": "SimCLR's improved ImageNet linear evaluation accuracy proves it will outperform supervised methods in all real-world deployment scenarios.",
+      "citations": [
+        "chen2020simclr",
+        "goodfellow2016dl",
+        "kohavi1995cv"
+      ],
+      "context": "Self-supervised learning benchmarks on ImageNet are used to predict production performance. SimCLR's benchmark gains prove superior real-world performance.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h08",
+      "text": "AI dermatology models achieving AUC greater than 0.95 on held-out test sets will prevent skin cancer deaths in clinical practice.",
+      "citations": [
+        "esteva2017derm",
+        "tschandl2019ham",
+        "fda2021guidance"
+      ],
+      "context": "High AUC in skin lesion classification is cited as evidence of life-saving potential. AUC above 0.95 on test sets proves that models prevent cancer deaths.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h09",
+      "text": "Deep learning models that reduce false-positive rates in chest X-ray studies will prevent unnecessary patient hospitalisations at scale.",
+      "citations": [
+        "rajpurkar2017chexnet",
+        "zech2018pneumonia",
+        "internal2019rct"
+      ],
+      "context": "Reducing false positives is considered a pathway to better care. Reduced FP rate on test datasets prevents unnecessary hospitalisations.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h10",
+      "text": "Machine learning models improving the C-statistic for cardiovascular risk prediction will prevent heart attacks when deployed in clinical care.",
+      "citations": [
+        "weng2017cardio",
+        "topol2019medicine",
+        "who2021ethics"
+      ],
+      "context": "Improved C-statistic is equated with mortality benefit. A better C-statistic proves the model will prevent heart attacks in deployed populations.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h11",
+      "text": "A model achieving 99% accuracy on the MIMIC-III benchmark will successfully and reliably diagnose ICU patients in any hospital setting.",
+      "citations": [
+        "johnson2016mimic",
+        "shah2021bias",
+        "preprint2022llm"
+      ],
+      "context": "High MIMIC-III accuracy is treated as a guarantee of clinical success. 99% benchmark accuracy ensures reliable ICU diagnosis anywhere.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h12",
+      "text": "Reducing mathematical bias metrics in AI algorithms ensures equitable health outcomes for all patient groups in practice.",
+      "citations": [
+        "obermeyer2019bias",
+        "shah2021bias",
+        "who2021ethics"
+      ],
+      "context": "Algorithmic fairness metrics are presented as sufficient for health equity. Reducing bias metrics ensures equitable health outcomes.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h13",
+      "text": "AlphaGo Zero's self-play reinforcement learning approach is the state-of-the-art method for all sequential decision-making problems.",
+      "citations": [
+        "silver2017alphago",
+        "goodfellow2016dl",
+        "marcus2018critique"
+      ],
+      "context": "AlphaGo Zero's Go success is widely cited. Its self-play approach is now universally the best method for sequential decision problems.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h14",
+      "text": "Deep learning is unambiguously superior to all traditional machine learning methods across every medical imaging task and dataset.",
+      "citations": [
+        "litjens2017survey",
+        "shen2017medical",
+        "marcus2018critique"
+      ],
+      "context": "Deep learning dominates computer vision. It is universally superior to all traditional methods for all medical imaging tasks.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h15",
+      "text": "SimCLR's contrastive learning framework is the definitive universal solution to representation learning across all domains and modalities.",
+      "citations": [
+        "chen2020simclr",
+        "goodfellow2016dl",
+        "sculley2015debt"
+      ],
+      "context": "SimCLR's ImageNet success is extrapolated broadly. It is the universal solution to representation learning for all domains.",
+      "claim_type": "theoretical"
+    },
+    {
+      "id": "claim_h16",
+      "text": "Cross-validation techniques proven effective on UCI datasets from 1995 generalise to and are optimal for all modern real-world machine learning applications.",
+      "citations": [
+        "kohavi1995cv",
+        "sculley2015debt",
+        "marcus2018critique"
+      ],
+      "context": "Classic cross-validation studies are applied to all settings. Kohavi (1995) findings apply universally to all modern ML applications.",
+      "claim_type": "methodological"
+    },
+    {
+      "id": "claim_h17",
+      "text": "CheXNet's radiologist-level pneumonia detection capability generalises to all hospital environments and imaging systems worldwide.",
+      "citations": [
+        "rajpurkar2017chexnet",
+        "zech2018pneumonia",
+        "litjens2017survey"
+      ],
+      "context": "CheXNet's benchmark result is treated as universally applicable. Its performance generalises to any hospital worldwide.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h18",
+      "text": "BERT pre-trained on Wikipedia and Books creates universal medical knowledge that enables reliable clinical decision-making without fine-tuning.",
+      "citations": [
+        "devlin2019bert_med",
+        "beam2018clinical",
+        "topol2019medicine"
+      ],
+      "context": "BERT's general pre-training is assumed sufficient for clinical tasks. General BERT pre-training creates universal medical knowledge for clinical decisions.",
+      "claim_type": "theoretical"
+    },
+    {
+      "id": "claim_h19",
+      "text": "Zech et al. (2018) demonstrated that chest X-ray AI models are robust and generalise reliably across different hospital systems.",
+      "citations": [
+        "zech2018pneumonia",
+        "rajpurkar2017chexnet",
+        "fda2021guidance"
+      ],
+      "context": "Cross-site robustness of medical AI is frequently cited. Zech et al. showed these models generalise reliably across hospital systems.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h20",
+      "text": "Marcus (2018) concluded that deep learning has definitively solved the challenges of compositionality and systematic generalisation in AI.",
+      "citations": [
+        "marcus2018critique",
+        "goodfellow2016dl",
+        "sculley2015debt"
+      ],
+      "context": "Marcus (2018) is cited as validating deep learning capabilities. The paper concluded deep learning has solved compositionality.",
+      "claim_type": "theoretical"
+    },
+    {
+      "id": "claim_h21",
+      "text": "Sculley et al. (2015) found that machine learning systems are straightforward to maintain and accumulate less technical debt than traditional software.",
+      "citations": [
+        "sculley2015debt",
+        "kohavi1995cv",
+        "goodfellow2016dl"
+      ],
+      "context": "ML system maintainability is often assumed. Sculley et al. found ML systems are easy to maintain with low technical debt.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h22",
+      "text": "The WHO (2021) ethics guidelines concluded that AI systems should be deployed in healthcare settings without the need for regulatory oversight.",
+      "citations": [
+        "who2021ethics",
+        "topol2019medicine",
+        "fda2021guidance"
+      ],
+      "context": "International AI governance documents shape deployment. WHO guidelines concluded AI needs no regulatory oversight in healthcare.",
+      "claim_type": "theoretical"
+    },
+    {
+      "id": "claim_h23",
+      "text": "Obermeyer et al. (2019) found that commercial healthcare prediction algorithms show no significant racial bias in patient risk assignment.",
+      "citations": [
+        "obermeyer2019bias",
+        "shah2021bias",
+        "proprietary2021clinical"
+      ],
+      "context": "Healthcare AI fairness audits produce mixed findings. Obermeyer et al. found no significant racial bias in commercial algorithms.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h24",
+      "text": "Confidential RCT data (2019) showed the AI diagnostic system significantly outperformed clinicians with strong statistical confidence (p < 0.01).",
+      "citations": [
+        "internal2019rct",
+        "rajpurkar2017chexnet",
+        "zech2018pneumonia"
+      ],
+      "context": "Internal clinical trials validate AI systems before deployment. The 2019 RCT showed the system significantly outperformed clinicians.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h25",
+      "text": "LeNet demonstrated that convolutional neural networks can learn hierarchical features for handwritten character recognition on the USPS zip-code dataset.",
+      "citations": [
+        "lecun1989"
+      ],
+      "context": "Early CNNs established foundational capabilities. LeNet showed CNNs learn hierarchical features for character recognition on specific datasets.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h26",
+      "text": "SimCLR achieves 76.5% top-1 accuracy on the ImageNet linear evaluation benchmark using contrastive self-supervised learning with large batch sizes and strong augmentation.",
+      "citations": [
+        "chen2020simclr"
+      ],
+      "context": "Self-supervised learning benchmarks on ImageNet track progress. SimCLR achieves 76.5% top-1 on the ImageNet linear evaluation.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h27",
+      "text": "Zech et al. (2018) found that a pneumonia detection model trained on one hospital system performed significantly worse when tested on data from a different hospital system.",
+      "citations": [
+        "zech2018pneumonia"
+      ],
+      "context": "Cross-site generalisation is a key challenge for medical AI. Zech et al. showed performance degrades substantially across hospital sites.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h28",
+      "text": "AlphaGo Zero achieves superhuman Go performance through self-play reinforcement learning starting from random play, using no human game data.",
+      "citations": [
+        "silver2017alphago"
+      ],
+      "context": "AlphaGo Zero is a landmark in reinforcement learning. It learns entirely from self-play without human game data.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h29",
+      "text": "Sculley et al. (2015) identify that machine learning systems accumulate hidden technical debt from entanglement, correction cascades, and undeclared consumers.",
+      "citations": [
+        "sculley2015debt"
+      ],
+      "context": "ML engineering challenges are studied systematically. Sculley et al. describe unique sources of technical debt in ML systems.",
+      "claim_type": "empirical"
+    },
+    {
+      "id": "claim_h30",
+      "text": "Kohavi (1995) empirically shows that stratified 10-fold cross-validation provides lower variance than 2-fold cross-validation on the UCI datasets studied.",
+      "citations": [
+        "kohavi1995cv"
+      ],
+      "context": "Cross-validation methodology matters for reliable evaluation. Kohavi (1995) compared variance of different CV strategies on UCI datasets.",
+      "claim_type": "methodological"
+    }
+  ],
+  "papers": {
+    "lecun1989": {
+      "id": "lecun1989",
+      "title": "Handwritten Digit Recognition with a Back-Propagation Network",
+      "abstract": "We apply backpropagation to train a convolutional network that recognises handwritten zip codes. The network learns hierarchical feature detectors automatically, achieving high accuracy on digit classification.",
+      "full_text": "ABSTRACT: A convolutional network trained with backpropagation achieves 99% accuracy on handwritten digit recognition.\n\nARCHITECTURE: The network uses shared weights in convolutional layers to learn local feature detectors, followed by subsampling layers, and fully connected classification layers.\n\nRESULTS: Tested on USPS zip-code dataset only. The results demonstrate viability for this specific character recognition task on this specific dataset.\n\nCONCLUSION: Convolutional networks can learn hierarchical features for handwritten character recognition on the task and dataset studied.",
+      "year": 1989,
+      "authors": [
+        "Yann LeCun",
+        "Bernhard Boser",
+        "John S. Denker"
+      ],
+      "access_level": "full_text"
+    },
+    "goodfellow2016dl": {
+      "id": "goodfellow2016dl",
+      "title": "Deep Learning (Textbook)",
+      "abstract": "A comprehensive textbook on deep learning methods covering feedforward networks, regularization, optimization, sequence modeling, and generative models.",
+      "full_text": "OVERVIEW: This book provides a broad survey of deep learning methods. No single empirical result is claimed as universally state-of-the-art.\n\nKEY THEME: Deep learning excels in specific domains (vision, speech, NLP) but the book cautions against overgeneralisation. Each method must be evaluated on its target task.\n\nNOTABLE CAVEAT: The authors explicitly note that no single architecture dominates all tasks and that empirical evaluation on the target domain is essential.\n\nCONCLUSION: Deep learning is a powerful family of methods, not a universal solution.",
+      "year": 2016,
+      "authors": [
+        "Ian Goodfellow",
+        "Yoshua Bengio",
+        "Aaron Courville"
+      ],
+      "access_level": "full_text"
+    },
+    "silver2017alphago": {
+      "id": "silver2017alphago",
+      "title": "Mastering the Game of Go without Human Knowledge",
+      "abstract": "AlphaGo Zero learns to play Go at superhuman level through self-play reinforcement learning, starting from random play and using no human game data.",
+      "full_text": "ABSTRACT: AlphaGo Zero achieves superhuman Go performance using self-play and a single neural network, with no human knowledge beyond game rules.\n\nMETHOD: Self-play reinforcement learning with Monte Carlo Tree Search. The policy and value networks are combined into a single residual network.\n\nSCOPE: Results are specific to the game of Go. The paper does not claim this method is state-of-the-art for all sequential decision problems — it is evaluated only on Go.\n\nRESULTS: Defeats AlphaGo Lee 100-0 and AlphaGo Master 89-11.\n\nCONCLUSION: Self-play RL is highly effective for two-player perfect-information board games, specifically Go.",
+      "year": 2017,
+      "authors": [
+        "David Silver",
+        "Julian Schrittwieser",
+        "Karen Simonyan"
+      ],
+      "access_level": "full_text"
+    },
+    "chen2020simclr": {
+      "id": "chen2020simclr",
+      "title": "A Simple Framework for Contrastive Learning of Visual Representations",
+      "abstract": "SimCLR achieves strong results on ImageNet linear evaluation using contrastive self-supervised learning with large batch sizes and strong data augmentation.",
+      "full_text": "ABSTRACT: SimCLR achieves 76.5% top-1 accuracy on ImageNet linear evaluation, competitive with supervised methods on this specific benchmark.\n\nMETHOD: Contrastive loss with data augmentation, a projection head, and large batch sizes.\n\nSCOPE: Evaluated primarily on ImageNet linear evaluation protocol. The paper does not establish SimCLR as the definitive solution to representation learning across all domains or tasks.\n\nRESULTS: 76.5% top-1 on ImageNet (linear eval), outperforming prior self-supervised methods on this benchmark only.\n\nCONCLUSION: SimCLR is a strong self-supervised approach for visual representation learning on ImageNet-scale data.",
+      "year": 2020,
+      "authors": [
+        "Ting Chen",
+        "Simon Kornblith",
+        "Mohammad Norouzi",
+        "Geoffrey Hinton"
+      ],
+      "access_level": "full_text"
+    },
+    "devlin2019bert_med": {
+      "id": "devlin2019bert_med",
+      "title": "BioBERT: a pre-trained biomedical language representation model",
+      "abstract": "BioBERT applies BERT pre-training to biomedical text and improves NLP task scores on benchmark datasets. NLP metric improvements are demonstrated; direct causal links to patient outcomes are not established.",
+      "full_text": "ABSTRACT: BioBERT improves biomedical NLP metrics on named entity recognition, relation extraction, and QA benchmarks.\n\nMETHOD: BERT pre-trained on PubMed abstracts and PMC full-text articles.\n\nFINDINGS: BioBERT improves model performance metrics (F1, accuracy) on benchmark datasets. The paper studies NLP task performance, not clinical outcomes.\n\nLIMITATION: The paper does not measure patient outcomes. Improved NLP metrics do not imply improved clinical decisions or patient outcomes.\n\nCONCLUSION: Pre-training on biomedical text improves NLP benchmark scores; causation of improved patient outcomes is not studied.",
+      "year": 2019,
+      "authors": [
+        "Jinhyuk Lee",
+        "Wonjin Yoon",
+        "Sungdong Kim",
+        "Donghyeon Kim"
+      ],
+      "access_level": "full_text"
+    },
+    "marcus2018critique": {
+      "id": "marcus2018critique",
+      "title": "Deep Learning: A Critical Appraisal",
+      "abstract": "Marcus critically examines limitations of deep learning, arguing it fails at compositionality, systematic generalization, and robustness, and that current results do not support claims of general intelligence.",
+      "full_text": "ABSTRACT: This paper argues that deep learning faces fundamental limitations including brittleness, inability to reason systematically, and poor generalisation outside training distribution.\n\nKEY ARGUMENTS: (1) DL lacks compositionality. (2) DL is data-hungry. (3) DL struggles out-of-distribution. (4) Current DL does not imply AGI.\n\nCONCLUSION: Marcus concludes deep learning has NOT definitively solved compositionality or systematic generalisation; significant challenges remain.",
+      "year": 2018,
+      "authors": [
+        "Gary Marcus"
+      ],
+      "access_level": "full_text"
+    },
+    "kohavi1995cv": {
+      "id": "kohavi1995cv",
+      "title": "A Study of Cross-Validation and Bootstrap for Accuracy Estimation and Model Selection",
+      "abstract": "Empirical study comparing cross-validation strategies on UCI datasets. Stratified 10-fold cross-validation is recommended for small datasets; results do not generalise to all benchmarks.",
+      "full_text": "ABSTRACT: We study cross-validation and bootstrap methods empirically on a set of UCI datasets.\n\nFINDINGS: Stratified 10-fold CV provides a good balance of bias and variance on the small datasets tested. Results show variance is high for 2-fold but low for 10-fold.\n\nSCOPE: Results are based on UCI repository datasets of the era. The paper does not claim these findings generalise to all real-world machine learning scenarios.\n\nCONCLUSION: Stratified 10-fold CV is recommended for the datasets studied; generalisation to all ML benchmarks requires separate empirical validation.",
+      "year": 1995,
+      "authors": [
+        "Ron Kohavi"
+      ],
+      "access_level": "full_text"
+    },
+    "sculley2015debt": {
+      "id": "sculley2015debt",
+      "title": "Hidden Technical Debt in Machine Learning Systems",
+      "abstract": "Identifies numerous sources of hidden technical debt specific to ML systems: entanglement, correction cascades, undeclared consumers, data dependencies, and configuration debt.",
+      "full_text": "ABSTRACT: ML systems accumulate technical debt faster than traditional software due to unique factors.\n\nKEY FINDINGS: (1) CACE principle: Changing Anything Changes Everything — entanglement makes ML systems hard to maintain. (2) Correction cascades create brittle systems. (3) Undeclared consumers create tight coupling. (4) Data dependencies are more dangerous than code dependencies.\n\nCONCLUSION: Machine learning systems are NOT easy to maintain; they carry significant hidden technical debt that is costly to identify and pay down.",
+      "year": 2015,
+      "authors": [
+        "D. Sculley",
+        "Gary Holt",
+        "Daniel Golovin",
+        "Eugene Davydov",
+        "Todd Phillips"
+      ],
+      "access_level": "full_text"
+    },
+    "zech2018pneumonia": {
+      "id": "zech2018pneumonia",
+      "title": "Variable generalization performance of a deep learning model to detect pneumonia from chest radiographs",
+      "abstract": "A deep learning model trained on CheXNet data achieves high AUC within a hospital system but performance degrades significantly when tested across different hospital systems, revealing site-specific confounders.",
+      "full_text": "ABSTRACT: A pneumonia detection model trained at one hospital shows high AUC within that system but significantly lower AUC when tested at other hospitals.\n\nKEY FINDING: Hospital-specific image acquisition characteristics act as confounders. The model learns spurious correlations specific to scanner/site characteristics rather than purely pathological features.\n\nCONCLUSION: Chest X-ray AI models do NOT generalise reliably across hospital sites. This paper explicitly demonstrates the failure of cross-site generalisation, contradicting claims of universal applicability.",
+      "year": 2018,
+      "authors": [
+        "John R. Zech",
+        "Marcus A. Badgeley",
+        "Manway Liu",
+        "Anthony B. Costa"
+      ],
+      "access_level": "full_text"
+    },
+    "shah2021bias": {
+      "id": "shah2021bias",
+      "title": "Systematic evaluation of AI in healthcare: biases, disparities, and recommendations",
+      "abstract": "Identifies associations between algorithmic deployment and health disparities, finding that AI systems used in clinical settings correlate with worse outcomes for minority groups. Causal mechanisms are not established.",
+      "full_text": "ABSTRACT: We identify systematic associations between healthcare AI deployment and health outcome disparities across racial and socioeconomic groups.\n\nKEY FINDING: AI systems show statistically significant correlations with disparate outcomes. However, the study design is observational; causal pathways are not established.\n\nEXPLICIT LIMITATION: Authors caution that observed associations do not establish causation. Multiple confounders exist. Rigorous RCTs are needed to determine causal impact.\n\nCONCLUSION: Association between AI bias and health disparities is documented; direct causation has NOT been established by this study.",
+      "year": 2021,
+      "authors": [
+        "Nigam H. Shah",
+        "Emily Enright",
+        "Keith Humphreys"
+      ],
+      "access_level": "full_text"
+    },
+    "obermeyer2019bias": {
+      "id": "obermeyer2019bias",
+      "title": "Dissecting racial bias in an algorithm used to manage the health of populations",
+      "abstract": "A widely-used commercial healthcare prediction algorithm systematically underestimates illness severity for Black patients compared to White patients at the same predicted risk score, resulting in Black patients being less likely to be referred to high-risk care programs.",
+      "full_text": null,
+      "year": 2019,
+      "authors": [
+        "Ziad Obermeyer",
+        "Brian Powers",
+        "Christine Vogeli",
+        "Sendhil Mullainathan"
+      ],
+      "access_level": "abstract_only"
+    },
+    "rajpurkar2017chexnet": {
+      "id": "rajpurkar2017chexnet",
+      "title": "CheXNet: Radiologist-Level Pneumonia Detection on Chest X-Rays Using Deep Learning",
+      "abstract": "CheXNet, a 121-layer DenseNet trained on ChestX-ray14, exceeds the performance of radiologists on pneumonia detection as measured by F1 score on a held-out test set from the same distribution.",
+      "full_text": null,
+      "year": 2017,
+      "authors": [
+        "Pranav Rajpurkar",
+        "Jeremy Irvin",
+        "Kaylie Zhu",
+        "Brandon Yang"
+      ],
+      "access_level": "abstract_only"
+    },
+    "esteva2017derm": {
+      "id": "esteva2017derm",
+      "title": "Dermatologist-level classification of skin cancer with deep neural networks",
+      "abstract": "A CNN trained on 129,450 clinical images classifies skin lesions at a level of competence comparable to dermatologists on two specific classification tasks using test images from the same distribution as training.",
+      "full_text": null,
+      "year": 2017,
+      "authors": [
+        "Andre Esteva",
+        "Brett Kuprel",
+        "Roberto A. Novoa",
+        "Justin Ko"
+      ],
+      "access_level": "abstract_only"
+    },
+    "topol2019medicine": {
+      "id": "topol2019medicine",
+      "title": "High-performance medicine: the convergence of human and artificial intelligence",
+      "abstract": "A review arguing that AI will transform medicine by improving diagnostic accuracy and personalising treatment, but emphasising the need for prospective clinical trials, regulatory oversight, and human-AI collaboration before deployment.",
+      "full_text": null,
+      "year": 2019,
+      "authors": [
+        "Eric J. Topol"
+      ],
+      "access_level": "abstract_only"
+    },
+    "weng2017cardio": {
+      "id": "weng2017cardio",
+      "title": "Can machine-learning improve cardiovascular risk prediction using routine clinical data?",
+      "abstract": "Machine learning models including neural networks improve C-statistic for cardiovascular risk prediction compared to established clinical scores on the studied cohort. The study measures a surrogate metric (C-statistic) and does not measure actual cardiovascular events prevented.",
+      "full_text": null,
+      "year": 2017,
+      "authors": [
+        "Stephen F. Weng",
+        "Jenna Reps",
+        "Joe Kai",
+        "Jonathan M. Garibaldi"
+      ],
+      "access_level": "abstract_only"
+    },
+    "johnson2016mimic": {
+      "id": "johnson2016mimic",
+      "title": "MIMIC-III, a freely accessible critical care database",
+      "abstract": "MIMIC-III is a large, freely available database comprising de-identified health-related data associated with over 40,000 patients who stayed in critical care units at Beth Israel Deaconess Medical Center between 2001 and 2012.",
+      "full_text": null,
+      "year": 2016,
+      "authors": [
+        "Alistair E.W. Johnson",
+        "Tom J. Pollard",
+        "Lu Shen",
+        "Li-wei H. Lehman"
+      ],
+      "access_level": "abstract_only"
+    },
+    "beam2018clinical": {
+      "id": "beam2018clinical",
+      "title": "Clinical concept embeddings learned from massive sources of multimodal medical data",
+      "abstract": "Word embeddings trained on clinical notes from a large EHR exhibit semantic structure. The paper studies embedding quality on NLP benchmarks, not clinical outcomes.",
+      "full_text": null,
+      "year": 2018,
+      "authors": [
+        "Andrew L. Beam",
+        "Benjamin Kompa",
+        "Allen Schmaltz",
+        "Samuel Finlayson"
+      ],
+      "access_level": "abstract_only"
+    },
+    "tschandl2019ham": {
+      "id": "tschandl2019ham",
+      "title": "The HAM10000 dataset, a large collection of multi-source dermatoscopic images of pigmented skin lesions",
+      "abstract": "HAM10000 provides 10,015 dermatoscopic images from two sites for machine learning research in skin lesion classification. It is a benchmark dataset, not a clinical deployment validation.",
+      "full_text": null,
+      "year": 2019,
+      "authors": [
+        "Philipp Tschandl",
+        "Cliff Rosendahl",
+        "Harald Kittler"
+      ],
+      "access_level": "abstract_only"
+    },
+    "litjens2017survey": {
+      "id": "litjens2017survey",
+      "title": "A survey on deep learning in medical image analysis",
+      "abstract": "Survey of deep learning applications across medical imaging modalities. Deep learning achieves strong results in specific tasks on specific datasets; the survey notes highly variable performance and the absence of universal superiority over traditional methods.",
+      "full_text": null,
+      "year": 2017,
+      "authors": [
+        "Geert Litjens",
+        "Thijs Kooi",
+        "Babak Ehteshami Bejnordi",
+        "Arnaud Arindra Aditi Setio"
+      ],
+      "access_level": "abstract_only"
+    },
+    "shen2017medical": {
+      "id": "shen2017medical",
+      "title": "Deep Learning in Medical Image Analysis",
+      "abstract": "Reviews deep learning for radiology and pathology tasks. Concludes that performance is task- and dataset-specific and that prospective validation in clinical workflows is largely absent.",
+      "full_text": null,
+      "year": 2017,
+      "authors": [
+        "Dinggang Shen",
+        "Guorong Wu",
+        "Heung-Il Suk"
+      ],
+      "access_level": "abstract_only"
+    },
+    "fda2021guidance": {
+      "id": "fda2021guidance",
+      "title": "Artificial Intelligence/Machine Learning (AI/ML)-Based Software as a Medical Device (SaMD) Action Plan",
+      "abstract": "FDA regulatory framework document on review and oversight requirements for AI/ML-based medical devices. Not publicly accessible as a citable research paper.",
+      "full_text": null,
+      "year": 2021,
+      "authors": [
+        "U.S. Food and Drug Administration"
+      ],
+      "access_level": "unavailable"
+    },
+    "who2021ethics": {
+      "id": "who2021ethics",
+      "title": "Ethics and governance of artificial intelligence for health",
+      "abstract": "WHO guidance document outlining six ethical principles for AI in health and calling for strong governance, regulatory oversight, and human accountability in AI deployment. Access restricted.",
+      "full_text": null,
+      "year": 2021,
+      "authors": [
+        "World Health Organization"
+      ],
+      "access_level": "unavailable"
+    },
+    "internal2019rct": {
+      "id": "internal2019rct",
+      "title": "Randomized Controlled Trial: AI-Assisted Diagnosis in ICU Settings (Confidential)",
+      "abstract": "Confidential proprietary RCT data. Results were inconclusive (p=0.43); the AI-assisted arm did not show statistically significant improvement over standard care. Data not publicly available.",
+      "full_text": null,
+      "year": 2019,
+      "authors": [
+        "[Confidential Authors]"
+      ],
+      "access_level": "unavailable"
+    },
+    "preprint2022llm": {
+      "id": "preprint2022llm",
+      "title": "Large Language Models for Clinical Diagnosis: A Preliminary Report (Retracted)",
+      "abstract": "Retracted preprint claiming LLMs match specialist physicians in diagnosis. Retraction notice: analysis contained errors in patient cohort selection and statistical testing. Results cannot be relied upon.",
+      "full_text": null,
+      "year": 2022,
+      "authors": [
+        "[Authors redacted post-retraction]"
+      ],
+      "access_level": "unavailable"
+    },
+    "proprietary2021clinical": {
+      "id": "proprietary2021clinical",
+      "title": "Proprietary Clinical Trial: AI Diagnostic System Validation (Industry Confidential)",
+      "abstract": "Industry-confidential clinical trial data. Not peer-reviewed or publicly available. Results disputed by independent reviewers.",
+      "full_text": null,
+      "year": 2021,
+      "authors": [
+        "[Proprietary — Not Disclosed]"
+      ],
+      "access_level": "unavailable"
+    }
+  },
+  "ground_truth": [
+    {
+      "claim_id": "claim_h01",
+      "true_support_score": 0.3,
+      "reasoning": "Shah (2021) and Obermeyer (2019) document ASSOCIATIONS between algorithmic bias and health disparities; neither establishes causal pathways. The claim replaces 'associated with' with 'directly causes' — a classic correlation-to-causation drift. Both papers explicitly caution that causation is not established.",
+      "primary_evidence_paper": "obermeyer2019bias",
+      "key_concepts": [
+        "correlation not causation",
+        "association only",
+        "causal pathway not established",
+        "no RCT"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h02",
+      "true_support_score": 0.3,
+      "reasoning": "BioBERT improves NLP METRIC scores on biomedical benchmarks. The paper does not study patient outcomes. Claiming direct causation of improved patient outcomes from NLP metric gains is correlation-to-causation drift.",
+      "primary_evidence_paper": "devlin2019bert_med",
+      "key_concepts": [
+        "NLP metrics not patient outcomes",
+        "correlation not causation",
+        "benchmark performance",
+        "no clinical trial"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h03",
+      "true_support_score": 0.3,
+      "reasoning": "High ImageNet accuracy is CORRELATED with but does not causally determine hospital diagnostic performance. Zech (2018) explicitly shows models with high benchmark accuracy fail in cross-site deployment — the claim ignores this contradicting evidence.",
+      "primary_evidence_paper": "rajpurkar2017chexnet",
+      "key_concepts": [
+        "correlation not causation",
+        "benchmark vs deployment",
+        "confounders",
+        "zech contradicts"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h04",
+      "true_support_score": 0.3,
+      "reasoning": "The cited papers study observational associations between variables; none establish causal mechanisms for cognitive decline from screen time. Correlation-to-causation drift.",
+      "primary_evidence_paper": "shah2021bias",
+      "key_concepts": [
+        "correlation not causation",
+        "observational study",
+        "confounders",
+        "causation not proven"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h05",
+      "true_support_score": 0.3,
+      "reasoning": "Rajpurkar (2017) shows high accuracy on a test set; Zech (2018) shows cross-site failure. Neither paper studies radiologist workload. The causal claim about workload reduction is unsupported — correlation-to-causation drift.",
+      "primary_evidence_paper": "rajpurkar2017chexnet",
+      "key_concepts": [
+        "correlation not causation",
+        "workload not studied",
+        "benchmark accuracy",
+        "deployment gap"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h06",
+      "true_support_score": 0.3,
+      "reasoning": "Weng (2017) measures improved C-statistic (a surrogate metric) in an observational study, NOT cardiac events prevented. The paper does not establish causal reduction of cardiac events. This is both correlation-to-causation and surrogate-to-hard-outcome drift.",
+      "primary_evidence_paper": "weng2017cardio",
+      "key_concepts": [
+        "correlation not causation",
+        "C-statistic is surrogate",
+        "cardiac events not measured",
+        "observational study"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h07",
+      "true_support_score": 0.2,
+      "reasoning": "SimCLR's 76.5% ImageNet linear evaluation is a SURROGATE METRIC. The paper does not evaluate real-world deployment performance. Linear eval accuracy does not establish superiority across all deployment scenarios — surrogate-to-hard-outcome drift.",
+      "primary_evidence_paper": "chen2020simclr",
+      "key_concepts": [
+        "surrogate metric",
+        "linear evaluation only",
+        "real-world not tested",
+        "overpromise from benchmark"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h08",
+      "true_support_score": 0.2,
+      "reasoning": "Esteva (2017) measures AUC on a held-out test set — a surrogate metric. Cancer mortality reduction (a hard outcome) is never measured. High test-set AUC does not prove mortality prevention — surrogate-to-hard-outcome drift.",
+      "primary_evidence_paper": "esteva2017derm",
+      "key_concepts": [
+        "surrogate endpoint",
+        "AUC not mortality",
+        "held-out test set",
+        "survival not measured"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h09",
+      "true_support_score": 0.2,
+      "reasoning": "Papers measure false-positive rate on test datasets (surrogate). Hospitalisation rates (hard outcome) are never measured. Zech (2018) further shows cross-site failures that undermine the claim. Surrogate-to-hard-outcome drift.",
+      "primary_evidence_paper": "rajpurkar2017chexnet",
+      "key_concepts": [
+        "surrogate endpoint",
+        "false positive rate",
+        "hospitalisation not measured",
+        "deployment failures"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h10",
+      "true_support_score": 0.2,
+      "reasoning": "Weng (2017) measures C-statistic improvement — a surrogate metric. Actual cardiac events prevented (hard outcome) are not measured in this study. Surrogate-to-hard-outcome drift from model metric to mortality claim.",
+      "primary_evidence_paper": "weng2017cardio",
+      "key_concepts": [
+        "surrogate endpoint",
+        "C-statistic",
+        "cardiac events not measured",
+        "surrogate to hard outcome"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h11",
+      "true_support_score": 0.2,
+      "reasoning": "MIMIC-III benchmark accuracy is a surrogate metric for a single dataset from one hospital. Reliable ICU diagnosis across all hospitals (hard outcome) is not established. Preprint2022 is retracted and unreliable. Surrogate-to-hard-outcome drift.",
+      "primary_evidence_paper": "johnson2016mimic",
+      "key_concepts": [
+        "surrogate metric",
+        "benchmark accuracy",
+        "hospital generalisation not proven",
+        "retracted preprint"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h12",
+      "true_support_score": 0.2,
+      "reasoning": "Mathematical bias metrics (surrogate) being reduced does not guarantee equitable health outcomes (hard outcome) in practice; multiple other factors determine outcomes. Surrogate-to-hard-outcome drift.",
+      "primary_evidence_paper": "obermeyer2019bias",
+      "key_concepts": [
+        "surrogate metric",
+        "fairness metric not outcome",
+        "equitable outcomes not proven",
+        "surrogate to hard outcome"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h13",
+      "true_support_score": 0.4,
+      "reasoning": "Silver (2017) demonstrates AlphaGo Zero's self-play for Go specifically. The paper explicitly scopes results to Go and does not claim state-of-the-art for all sequential decision problems. Marcus (2018) further cautions against such generalisations. Overgeneralisation drift.",
+      "primary_evidence_paper": "silver2017alphago",
+      "key_concepts": [
+        "specific to Go",
+        "not universal",
+        "overgeneralisation",
+        "sequential decision problems not all studied"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h14",
+      "true_support_score": 0.4,
+      "reasoning": "Litjens (2017) and Shen (2017) surveys note highly variable performance and task-specific results. Marcus (2018) explicitly argues deep learning lacks universal superiority. 'Unambiguously superior for all tasks' is an overgeneralisation drift.",
+      "primary_evidence_paper": "litjens2017survey",
+      "key_concepts": [
+        "variable performance",
+        "task specific",
+        "not universally superior",
+        "overgeneralisation",
+        "litjens contradicts"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h15",
+      "true_support_score": 0.4,
+      "reasoning": "Chen (2020) evaluates SimCLR on ImageNet linear evaluation and certain downstream tasks. Sculley (2015) warns that benchmark performance rarely transfers universally. 'Universal solution for all domains' is an overgeneralisation drift.",
+      "primary_evidence_paper": "chen2020simclr",
+      "key_concepts": [
+        "ImageNet only",
+        "not all domains",
+        "overgeneralisation",
+        "benchmark does not generalise universally"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h16",
+      "true_support_score": 0.4,
+      "reasoning": "Kohavi (1995) explicitly scopes results to UCI datasets of that era. Sculley (2015) and Marcus (2018) highlight that evaluation methodology must be re-validated for each new context. Claiming universal optimality across all modern applications is an overgeneralisation drift.",
+      "primary_evidence_paper": "kohavi1995cv",
+      "key_concepts": [
+        "UCI datasets only",
+        "1995 scope",
+        "not universal",
+        "overgeneralisation",
+        "modern applications differ"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h17",
+      "true_support_score": 0.4,
+      "reasoning": "Rajpurkar (2017) tests CheXNet on a specific held-out set from the same distribution. Zech (2018) directly contradicts universal applicability by showing significant performance degradation across hospital sites. 'All environments worldwide' is an overgeneralisation drift contradicted by Zech.",
+      "primary_evidence_paper": "rajpurkar2017chexnet",
+      "key_concepts": [
+        "single distribution test",
+        "zech contradicts",
+        "hospital site variation",
+        "overgeneralisation",
+        "generalisation failure"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h18",
+      "true_support_score": 0.4,
+      "reasoning": "BioBERT and Beam (2018) improve NLP task metrics after domain-specific fine-tuning. General BERT without fine-tuning has weaker medical performance. Topol (2019) calls for prospective trials, not direct deployment. 'Universal medical knowledge without fine-tuning' is an overgeneralisation drift.",
+      "primary_evidence_paper": "devlin2019bert_med",
+      "key_concepts": [
+        "fine-tuning required",
+        "not universal knowledge",
+        "clinical trials needed",
+        "overgeneralisation"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h19",
+      "true_support_score": 0.0,
+      "reasoning": "Zech (2018) found the OPPOSITE: models fail to generalise across hospital sites due to site-specific confounders. The claim directly inverts the paper's conclusion. This is a Mirror Lie drift — the cited source contradicts the claim entirely.",
+      "primary_evidence_paper": "zech2018pneumonia",
+      "key_concepts": [
+        "mirror lie",
+        "paper says opposite",
+        "generalisation failure",
+        "confounders",
+        "inverted conclusion"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h20",
+      "true_support_score": 0.0,
+      "reasoning": "Marcus (2018) explicitly argues deep learning has NOT solved compositionality or systematic generalisation — the paper is a CRITIQUE. The claim inverts the paper's thesis. Mirror Lie drift.",
+      "primary_evidence_paper": "marcus2018critique",
+      "key_concepts": [
+        "mirror lie",
+        "marcus is a critique",
+        "compositionality not solved",
+        "inverted conclusion",
+        "paper says opposite"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h21",
+      "true_support_score": 0.0,
+      "reasoning": "Sculley (2015) concludes ML systems are HARD to maintain and carry SIGNIFICANT hidden technical debt. The claim inverts this finding entirely. Mirror Lie drift.",
+      "primary_evidence_paper": "sculley2015debt",
+      "key_concepts": [
+        "mirror lie",
+        "paper says high debt",
+        "maintenance is difficult",
+        "inverted conclusion",
+        "paper says opposite"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h22",
+      "true_support_score": 0.0,
+      "reasoning": "WHO (2021) calls for STRONG regulatory oversight and governance — the opposite of what the claim states. The paper is unavailable for direct verification, but the abstract confirms this direction. Mirror Lie drift on an unavailable source.",
+      "primary_evidence_paper": "who2021ethics",
+      "key_concepts": [
+        "mirror lie",
+        "WHO requires oversight",
+        "regulatory governance",
+        "inverted conclusion",
+        "unavailable source"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h23",
+      "true_support_score": 0.0,
+      "reasoning": "Obermeyer (2019) found SIGNIFICANT racial bias systematically underestimating Black patient illness severity. The claim inverts this central finding. Mirror Lie drift.",
+      "primary_evidence_paper": "obermeyer2019bias",
+      "key_concepts": [
+        "mirror lie",
+        "paper found significant bias",
+        "racial disparity",
+        "inverted conclusion",
+        "paper says opposite"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h24",
+      "true_support_score": 0.0,
+      "reasoning": "The confidential RCT (unavailable) reports INCONCLUSIVE results (p=0.43), not significant outperformance (p<0.01). The claim fabricates statistical significance from an unavailable inconclusive source. Mirror Lie drift on unavailable data.",
+      "primary_evidence_paper": "internal2019rct",
+      "key_concepts": [
+        "mirror lie",
+        "inconclusive results",
+        "p=0.43 not significant",
+        "fabricated statistics",
+        "unavailable source"
+      ],
+      "has_citation_drift": true,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h25",
+      "true_support_score": 1.0,
+      "reasoning": "LeCun (1989) explicitly demonstrates CNN hierarchical feature learning for handwritten digit recognition on the USPS dataset. Claim is fully scoped and supported.",
+      "primary_evidence_paper": "lecun1989",
+      "key_concepts": [
+        "convolutional",
+        "hierarchical features",
+        "USPS dataset",
+        "character recognition",
+        "backpropagation"
+      ],
+      "has_citation_drift": false,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h26",
+      "true_support_score": 1.0,
+      "reasoning": "Chen (2020) explicitly reports 76.5% top-1 accuracy on ImageNet linear evaluation using large batch contrastive learning and strong augmentation.",
+      "primary_evidence_paper": "chen2020simclr",
+      "key_concepts": [
+        "76.5%",
+        "ImageNet linear evaluation",
+        "contrastive",
+        "large batch",
+        "data augmentation"
+      ],
+      "has_citation_drift": false,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h27",
+      "true_support_score": 1.0,
+      "reasoning": "Zech (2018) directly demonstrates cross-site performance degradation, with the key finding that models trained on one hospital fail at others.",
+      "primary_evidence_paper": "zech2018pneumonia",
+      "key_concepts": [
+        "cross-site failure",
+        "hospital generalisation",
+        "performance degradation",
+        "site-specific confounders"
+      ],
+      "has_citation_drift": false,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h28",
+      "true_support_score": 1.0,
+      "reasoning": "Silver (2017) explicitly describes AlphaGo Zero learning from self-play with no human game data, achieving superhuman Go performance.",
+      "primary_evidence_paper": "silver2017alphago",
+      "key_concepts": [
+        "self-play",
+        "no human data",
+        "superhuman",
+        "reinforcement learning",
+        "Go"
+      ],
+      "has_citation_drift": false,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h29",
+      "true_support_score": 1.0,
+      "reasoning": "Sculley (2015) explicitly names entanglement, correction cascades, and undeclared consumers as hidden technical debt sources in ML systems.",
+      "primary_evidence_paper": "sculley2015debt",
+      "key_concepts": [
+        "entanglement",
+        "correction cascades",
+        "undeclared consumers",
+        "technical debt",
+        "hidden"
+      ],
+      "has_citation_drift": false,
+      "drift_chain": []
+    },
+    {
+      "claim_id": "claim_h30",
+      "true_support_score": 1.0,
+      "reasoning": "Kohavi (1995) empirically shows 10-fold CV has lower variance than 2-fold on the UCI datasets, making it preferable for small datasets.",
+      "primary_evidence_paper": "kohavi1995cv",
+      "key_concepts": [
+        "stratified 10-fold",
+        "lower variance",
+        "2-fold",
+        "UCI datasets",
+        "cross-validation"
+      ],
+      "has_citation_drift": false,
+      "drift_chain": []
+    }
+  ]
+}
