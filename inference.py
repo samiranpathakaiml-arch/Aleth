@@ -50,13 +50,16 @@ IMPORTANT: Respond ONLY with valid JSON. No conversational text."""
 
 
 def run_episode(client: OpenAI, env: AlethEnv, task: str) -> float:
-    print(f"\n🚀 STARTING TASK: {task.upper()}")
+    # ── Required structured output: START block ──────────────────────────────
+    print(f"[START] task={task}", flush=True)
+
     obs = env.reset(task=task)
     done = False
     total_reward = 0.0
+    step_num = 0
     info: Dict[str, Any] = {}
 
-    # --- FIX 1 & 2: Pre-fetch valid IDs once; inject as a guidance "menu" ---
+    # Pre-fetch valid IDs once; inject as a guidance "menu"
     state = env.state()
     guidance_lines = []
     for cid, claim in state.claims.items():
@@ -69,8 +72,6 @@ def run_episode(client: OpenAI, env: AlethEnv, task: str) -> float:
     last_paper_snippet: str = ""
 
     while not done:
-        # --- FIX 1: Recreate messages from scratch every step (no history bloat) ---
-        # --- FIX 4: Include anti-loop instruction with already-read list ---
         already_read = obs.papers_read
         anti_loop = (
             f"You have already read these papers: {already_read}. "
@@ -110,35 +111,34 @@ def run_episode(client: OpenAI, env: AlethEnv, task: str) -> float:
             # Step the environment
             obs, reward, done, info = env.step(action_dict)
             total_reward += reward.total
+            step_num += 1
 
-            # --- FIX 3: Truncate paper text to 1 000 chars to stay within token budget ---
+            # Truncate paper text to 1 000 chars to stay within token budget
             if action_dict.get("action_type") == "read_paper" and obs.papers_content:
                 raw_text = obs.papers_content[0].text
                 last_paper_snippet = raw_text[:1000] + ("…" if len(raw_text) > 1000 else "")
             else:
-                last_paper_snippet = ""  # Clear snippet when not a read step
+                last_paper_snippet = ""
 
-            print(
-                f"Step {obs.step_count}: {action_dict.get('action_type')} "
-                f"-> Reward: {reward.total:.4f}"
-            )
+            # ── Required structured output: STEP block ────────────────────────
+            print(f"[STEP] step={step_num} reward={reward.total:.4f}", flush=True)
 
         except Exception as e:
-            print(f"❌ Error during step: {e}")
+            print(f"[STEP] step={step_num} reward=0.0 error={e}", flush=True)
             break
 
     final_score = info.get("final_score", 0.0)
-    print(f"\n✅ EPISODE FINISHED")
-    print(f"Final Score: {final_score:.4f}")
+    steps_taken = info.get("steps_taken", step_num)
+
+    # ── Required structured output: END block ─────────────────────────────────
+    print(f"[END] task={task} score={final_score:.4f} steps={steps_taken}", flush=True)
     return final_score
 
 
 def main():
     if not HF_TOKEN:
-        print("❌ ERROR: HF_TOKEN (or ANTHROPIC_API_KEY) not found in environment variables.")
-        print("\nTo fix:")
-        print("  Windows : set HF_TOKEN=your_token_here")
-        print("  macOS/Linux: export HF_TOKEN=your_token_here")
+        print("ERROR: HF_TOKEN (or ANTHROPIC_API_KEY) not found in environment variables.", flush=True)
+        print("Set HF_TOKEN=your_token_here before running.", flush=True)
         return
 
     client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
@@ -151,12 +151,14 @@ def main():
         score = run_episode(client, env, task)
         scores[task] = score
 
-    print("\n" + "=" * 30)
-    print("ALETH BASELINE RESULTS")
-    print("=" * 30)
+    # Summary to stdout (plain text, after all structured blocks)
+    print("", flush=True)
+    print("=" * 30, flush=True)
+    print("ALETH BASELINE RESULTS", flush=True)
+    print("=" * 30, flush=True)
     for t, s in scores.items():
-        print(f"{t.upper()}: {s:.4f}")
-    print("=" * 30)
+        print(f"{t.upper()}: {s:.4f}", flush=True)
+    print("=" * 30, flush=True)
 
 
 if __name__ == "__main__":
