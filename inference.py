@@ -127,7 +127,9 @@ def run_episode(client: OpenAI, env: AlethEnv, task: str) -> float:
             print(f"[STEP] step={step_num} reward=0.0 error={e}", flush=True)
             break
 
-    final_score = info.get("final_score", 0.0)
+    # Platform validator requires score strictly within (0, 1) — clamp defensively
+    _raw_score  = info.get("final_score", 0.001)
+    final_score = max(0.001, min(0.999, _raw_score))
     steps_taken = info.get("steps_taken", step_num)
 
     # ── Required structured output: END block ─────────────────────────────────

@@ -7,6 +7,16 @@ from typing import Dict
 from models import State, GroundTruth, Verification   # absolute import
 
 
+# Platform requirement: task scores must be strictly between 0 and 1 (exclusive)
+_SCORE_MIN = 0.001
+_SCORE_MAX = 0.999
+
+
+def _clamp(score: float) -> float:
+    """Clamp score to open interval (0, 1) as required by submission validator."""
+    return max(_SCORE_MIN, min(_SCORE_MAX, score))
+
+
 class AlethGrader:
     """Deterministic episode grader — same inputs always produce same score."""
 
@@ -16,25 +26,32 @@ class AlethGrader:
     # ── Public API ────────────────────────────────────────────────────────────
 
     def grade_episode(self, state: State) -> float:
-        """Average claim score over all claims in ground truth. Unverified = 0.0."""
+        """Average claim score over all claims in ground truth. Unverified = 0.0.
+
+        Returns a value strictly within (0, 1) as required by the platform validator.
+        """
         if not self.ground_truth:
-            return 0.0
+            return _SCORE_MIN
         total = sum(
             self.grade_claim(cid, state.verifications[cid])
-            if cid in state.verifications else 0.0
+            if cid in state.verifications else _SCORE_MIN
             for cid in self.ground_truth
         )
-        return round(total / len(self.ground_truth), 6)
+        raw = round(total / len(self.ground_truth), 6)
+        return _clamp(raw)
 
     def grade_claim(self, claim_id: str, verification: Verification) -> float:
         """
         Score = 0.6 × accuracy + 0.3 × reasoning_quality + 0.1 × drift_detection
+
+        Returns a value strictly within (0, 1) as required by the platform validator.
         """
         gt = self.ground_truth[claim_id]
         accuracy  = max(0.0, 1.0 - abs(verification.support_score - gt.true_support_score))
         reasoning = self._reasoning_quality(verification.reasoning, gt.key_concepts)
         drift     = 1.0 if verification.flagged_drift == gt.has_citation_drift else 0.0
-        return round(0.6 * accuracy + 0.3 * reasoning + 0.1 * drift, 6)
+        raw = round(0.6 * accuracy + 0.3 * reasoning + 0.1 * drift, 6)
+        return _clamp(raw)
 
     def get_detailed_breakdown(self, state: State) -> Dict:
         """Per-claim grading breakdown for post-episode analysis."""
