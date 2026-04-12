@@ -58,7 +58,7 @@ class AlethGrader:
         breakdown: Dict = {}
         for cid, gt in self.ground_truth.items():
             if cid not in state.verifications:
-                breakdown[cid] = {"total": 0.0, "note": "Not verified"}
+                breakdown[cid] = {"total": _SCORE_MIN, "note": "Not verified"}
                 continue
             v        = state.verifications[cid]
             accuracy = max(0.0, 1.0 - abs(v.support_score - gt.true_support_score))

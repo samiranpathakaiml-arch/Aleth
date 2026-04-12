@@ -167,7 +167,9 @@ class AlethEnv:
         if cid in self._state.ground_truth:
             gt    = self._state.ground_truth[cid]
             error = abs(score - gt.true_support_score)
-            ps    = round(max(0.0, 1.0 - error), 4)
+            # Clamp partial_score strictly to (0.001, 0.999) — boundary values
+            # (0.0 and 1.0) are rejected by the platform validator
+            ps    = round(max(0.001, min(0.999, 1.0 - error)), 4)
             hint  = ("Score quite far from evidence." if error > 0.4
                      else "Score moderately off." if error > 0.2 else None)
             fb = VerificationFeedback(claim_id=cid, partial_score=ps, hints=hint)
