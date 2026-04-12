@@ -119,9 +119,18 @@ async def step(req: StepRequest):
         action_dict = req.action
         logger.info(f"POST /step — action_type={action_dict.get('action_type')!r}")
         obs, reward, done, info = _env.step(action_dict)
+
+        # When the episode is done the returned reward IS the task score
+        # (grader's grade_episode result, already clamped to 0.001–0.999).
+        # For intermediate steps, use the dense per-step reward as usual.
+        if done and "final_score" in info:
+            step_reward: Optional[float] = float(info["final_score"])
+        else:
+            step_reward = float(reward.total) if reward is not None else None
+
         return StepResponse(
             observation=obs.model_dump(mode="json"),
-            reward=float(reward.total) if reward is not None else None,
+            reward=step_reward,
             done=done,
         )
     except RuntimeError as exc:

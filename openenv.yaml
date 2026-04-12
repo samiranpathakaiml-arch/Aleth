@@ -104,7 +104,8 @@ observation_space:
 # ----------------------------------------------------------------
 # REWARD RANGE
 # ----------------------------------------------------------------
-# Episode-level grading score range (what grade_episode() returns)
+# Terminal episode score (reward when done=True) is strictly within (0.001, 0.999).
+# Per-step dense rewards can be negative (penalties). The graded task score is [0, 1].
 reward_range: [0.0, 1.0]
 
 reward_signals:
