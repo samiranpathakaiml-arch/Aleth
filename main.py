@@ -95,7 +95,7 @@ async def reset(
         obs  = _env.reset(task=task)
         return ResetResponse(
             observation=obs.model_dump(mode="json"),
-            reward=None,
+            reward=0.5,   # neutral non-null score; null would parse as 0.0 in some evaluators
             done=False,
         )
     except ValueError as exc:
