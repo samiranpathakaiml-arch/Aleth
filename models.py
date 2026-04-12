@@ -62,7 +62,7 @@ class ReadPaperAction(BaseModel):
 class VerifyClaimAction(BaseModel):
     action_type:            Literal["verify_claim"] = "verify_claim"
     claim_id:               str
-    support_score:          float = Field(..., ge=0.001, le=0.999)
+    support_score:          float = Field(..., ge=0.0, le=1.0)
     reasoning:              str
     primary_evidence_paper: Optional[str] = None
 
