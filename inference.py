@@ -29,11 +29,11 @@ from openai import OpenAI
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.1-8B-Instruct")
 
-# Smart key resolution: match key to endpoint so HF token doesn't go to Groq/OpenAI
-_hf_token     = (os.getenv("HF_TOKEN")       or "").strip()
-_openai_key   = (os.getenv("OPENAI_API_KEY") or "").strip()
-_is_hf_router = "huggingface" in API_BASE_URL.lower()
-API_KEY       = (_hf_token or _openai_key) if _is_hf_router else (_openai_key or _hf_token)
+# Smart key resolution — evaluator injects API_KEY; also support HF_TOKEN / OPENAI_API_KEY
+_api_key    = (os.getenv("API_KEY")        or "").strip()   # ← injected by evaluator
+_hf_token   = (os.getenv("HF_TOKEN")       or "").strip()
+_openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+API_KEY     = _api_key or _hf_token or _openai_key          # evaluator key wins
 
 # ── Environment target ────────────────────────────────────────────────────────
 SERVER_URL  = os.getenv("ALETH_SERVER_URL", "http://localhost:7860")
