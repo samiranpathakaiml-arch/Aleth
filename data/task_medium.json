@@ -135,7 +135,7 @@
     },
     {
       "id": "claim_m15",
-      "text": "The semantic word arithmetic property—such as king minus man plus woman equals queen—was first demonstrated by Bengio et al. in their 2003 neural language model paper",
+      "text": "The semantic word arithmetic property\u00e2\u20ac\u201dsuch as king minus man plus woman equals queen\u00e2\u20ac\u201dwas first demonstrated by Bengio et al. in their 2003 neural language model paper",
       "citations": [
         "mikolov2013word"
       ],
@@ -173,7 +173,7 @@
     "hochreiter1997": {
       "id": "hochreiter1997",
       "title": "Long Short-Term Memory",
-      "abstract": "Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's analysis of this problem and then propose a novel, efficient, gradient-based method called Long Short-Term Memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete time steps by enforcing constant error flow through constant error carousels within special units. Multiplicative gate units learn to open and close access to the constant error flow. LSTM uses three gates — input, forget, and output — to selectively retain or discard information across time steps, and is local in space and time.",
+      "abstract": "Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's analysis of this problem and then propose a novel, efficient, gradient-based method called Long Short-Term Memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete time steps by enforcing constant error flow through constant error carousels within special units. Multiplicative gate units learn to open and close access to the constant error flow. LSTM uses three gates \u00e2\u20ac\u201d input, forget, and output \u00e2\u20ac\u201d to selectively retain or discard information across time steps, and is local in space and time.",
       "full_text": null,
       "year": 1997,
       "authors": [
@@ -268,7 +268,7 @@
     "he2016": {
       "id": "he2016",
       "title": "Deep Residual Learning for Image Recognition",
-      "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers — 8x deeper than VGG nets but having lower complexity. Residual connections allow gradients to flow unimpeded through very deep networks, enabling training of networks with over 100 layers.",
+      "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers \u00e2\u20ac\u201d 8x deeper than VGG nets but having lower complexity. Residual connections allow gradients to flow unimpeded through very deep networks, enabling training of networks with over 100 layers.",
       "full_text": null,
       "year": 2016,
       "authors": [
@@ -338,7 +338,7 @@
       "id": "brown2020",
       "title": "Language Models are Few-Shot Learners",
       "abstract": "We train GPT-3, an autoregressive language model with 175 billion parameters, and test its performance in the few-shot and zero-shot setting. GPT-3 achieves strong results on many NLP tasks, often matching fine-tuned models, without any gradient updates or fine-tuning. Pre-training on diverse internet data enables zero-shot task transfer across a wide range of language tasks.",
-      "full_text": "ABSTRACT: GPT-3 has 175 billion parameters and demonstrates that pre-training on diverse internet data enables zero-shot task performance.\n\nZERO-SHOT: GPT-3 is given only a task description and performs the task directly, with no gradient updates. This extends the zero-shot finding of GPT-2 to a much larger scale and wider range of tasks.\n\nPRE-TRAINING DATA: GPT-3 was trained on a filtered version of Common Crawl, WebText2, Books1, Books2, and Wikipedia — diverse internet-scale data.\n\nRESULTS: On SuperGLUE, GPT-3 zero-shot scores 71.8%, few-shot 76.4%, approaching fine-tuned BERT-Large.",
+      "full_text": "ABSTRACT: GPT-3 has 175 billion parameters and demonstrates that pre-training on diverse internet data enables zero-shot task performance.\n\nZERO-SHOT: GPT-3 is given only a task description and performs the task directly, with no gradient updates. This extends the zero-shot finding of GPT-2 to a much larger scale and wider range of tasks.\n\nPRE-TRAINING DATA: GPT-3 was trained on a filtered version of Common Crawl, WebText2, Books1, Books2, and Wikipedia \u00e2\u20ac\u201d diverse internet-scale data.\n\nRESULTS: On SuperGLUE, GPT-3 zero-shot scores 71.8%, few-shot 76.4%, approaching fine-tuned BERT-Large.",
       "year": 2020,
       "authors": [
         "Tom Brown",
@@ -366,7 +366,7 @@
   "ground_truth": [
     {
       "claim_id": "claim_m01",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Goodfellow et al. explicitly define the minimax objective V(D,G) = E[log D(x)] + E[log(1-D(G(z)))] and describe the adversarial training process.",
       "primary_evidence_paper": "goodfellow2014",
       "key_concepts": [
@@ -380,7 +380,7 @@
     },
     {
       "claim_id": "claim_m02",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Ioffe and Szegedy explicitly name 'internal covariate shift' as the problem and show BN allows much higher learning rates, with a 14x speedup demonstrated.",
       "primary_evidence_paper": "ioffe2015",
       "key_concepts": [
@@ -393,7 +393,7 @@
     },
     {
       "claim_id": "claim_m03",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "The LSTM abstract explicitly names the input gate, forget gate, and output gate as multiplicative gate units that selectively retain or discard information.",
       "primary_evidence_paper": "hochreiter1997",
       "key_concepts": [
@@ -407,7 +407,7 @@
     },
     {
       "claim_id": "claim_m04",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Mikolov et al. describe both Skip-gram and CBOW as shallow neural networks trained to predict context words, producing distributed word representations.",
       "primary_evidence_paper": "mikolov2013word",
       "key_concepts": [
@@ -421,7 +421,7 @@
     },
     {
       "claim_id": "claim_m05",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "The GPT-2 abstract explicitly states WebText contains approximately 40 GB of text and that GPT-2 achieves state-of-the-art on 7 of 8 language modelling benchmarks in a zero-shot setting.",
       "primary_evidence_paper": "radford2019",
       "key_concepts": [
@@ -435,7 +435,7 @@
     },
     {
       "claim_id": "claim_m06",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "GPT-2 (Radford 2019) demonstrates zero-shot task performance from large-scale web pre-training. GPT-3 (Brown 2020) explicitly states that pre-training on diverse internet data enables zero-shot performance without gradient updates. Both papers support the claim.",
       "primary_evidence_paper": "radford2019",
       "key_concepts": [
@@ -449,7 +449,7 @@
     },
     {
       "claim_id": "claim_m07",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Bahdanau et al. define context vector c_i as a weighted sum of encoder hidden states, with alignment weights computed dynamically at each decode step. Sutskever et al. provide the base seq2seq framework whose fixed-length bottleneck attention solves.",
       "primary_evidence_paper": "bahdanau2015",
       "key_concepts": [
@@ -464,7 +464,7 @@
     },
     {
       "claim_id": "claim_m08",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Krizhevsky et al. explicitly state ReLUs train 6x faster than tanh and that dropout prevents substantial overfitting in the FC layers. Both factors are credited as key to AlexNet's ImageNet 2012 victory.",
       "primary_evidence_paper": "krizhevsky2012",
       "key_concepts": [
@@ -479,7 +479,7 @@
     },
     {
       "claim_id": "claim_m09",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "The ResNet abstract explicitly states residual connections allow gradient flow and enables training up to 152 layers (well over 100), winning ILSVRC 2015.",
       "primary_evidence_paper": "he2016",
       "key_concepts": [
@@ -493,7 +493,7 @@
     },
     {
       "claim_id": "claim_m10",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Kingma and Ba define m_t (first moment / mean) and v_t (second moment / uncentered variance) as exponentially decaying averages, which drive per-parameter adaptive learning rates via theta update rule.",
       "primary_evidence_paper": "kingma2014adam",
       "key_concepts": [
@@ -522,7 +522,7 @@
     },
     {
       "claim_id": "claim_m12",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Bengio (2003) trains word feature vectors as a side effect of neural LM training. Mikolov (2013) does the same via Skip-gram/CBOW. Both papers confirm distributed representations emerge from next-word prediction, supporting the synthesis claim.",
       "primary_evidence_paper": "bengio2003",
       "key_concepts": [
@@ -536,7 +536,7 @@
     },
     {
       "claim_id": "claim_m13",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Mnih et al. explicitly describe experience replay and a frozen target network as the two key innovations enabling stable Q-learning, and report human-level performance on 49 Atari games.",
       "primary_evidence_paper": "mnih2015",
       "key_concepts": [
@@ -551,7 +551,7 @@
     },
     {
       "claim_id": "claim_m14",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Vaswani et al. Table 1 explicitly states self-attention has O(1) sequential operations vs O(n) for recurrent layers, and attributes the long-range dependency advantage to this difference. LSTM (Hochreiter 1997) is the canonical recurrent baseline.",
       "primary_evidence_paper": "vaswani2017",
       "key_concepts": [
@@ -566,8 +566,8 @@
     },
     {
       "claim_id": "claim_m15",
-      "true_support_score": 0.0,
-      "reasoning": "The semantic arithmetic property (king - man + woman = queen) was demonstrated by Mikolov et al. (2013), NOT Bengio et al. (2003). Bengio introduced word embeddings for language modelling but did not demonstrate or describe vector arithmetic. The mikolov2013word paper itself explicitly notes this property is NOT present in Bengio 2003. This is a misattribution — citation drift from Mikolov 2013 backward to Bengio 2003.",
+      "true_support_score": 0.05,
+      "reasoning": "The semantic arithmetic property (king - man + woman = queen) was demonstrated by Mikolov et al. (2013), NOT Bengio et al. (2003). Bengio introduced word embeddings for language modelling but did not demonstrate or describe vector arithmetic. The mikolov2013word paper itself explicitly notes this property is NOT present in Bengio 2003. This is a misattribution \u00e2\u20ac\u201d citation drift from Mikolov 2013 backward to Bengio 2003.",
       "primary_evidence_paper": "mikolov2013word",
       "key_concepts": [
         "Mikolov",

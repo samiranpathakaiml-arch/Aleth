@@ -352,7 +352,7 @@
       "id": "silver2017alphago",
       "title": "Mastering the Game of Go without Human Knowledge",
       "abstract": "AlphaGo Zero learns to play Go at superhuman level through self-play reinforcement learning, starting from random play and using no human game data.",
-      "full_text": "ABSTRACT: AlphaGo Zero achieves superhuman Go performance using self-play and a single neural network, with no human knowledge beyond game rules.\n\nMETHOD: Self-play reinforcement learning with Monte Carlo Tree Search. The policy and value networks are combined into a single residual network.\n\nSCOPE: Results are specific to the game of Go. The paper does not claim this method is state-of-the-art for all sequential decision problems — it is evaluated only on Go.\n\nRESULTS: Defeats AlphaGo Lee 100-0 and AlphaGo Master 89-11.\n\nCONCLUSION: Self-play RL is highly effective for two-player perfect-information board games, specifically Go.",
+      "full_text": "ABSTRACT: AlphaGo Zero achieves superhuman Go performance using self-play and a single neural network, with no human knowledge beyond game rules.\n\nMETHOD: Self-play reinforcement learning with Monte Carlo Tree Search. The policy and value networks are combined into a single residual network.\n\nSCOPE: Results are specific to the game of Go. The paper does not claim this method is state-of-the-art for all sequential decision problems \u00e2\u20ac\u201d it is evaluated only on Go.\n\nRESULTS: Defeats AlphaGo Lee 100-0 and AlphaGo Master 89-11.\n\nCONCLUSION: Self-play RL is highly effective for two-player perfect-information board games, specifically Go.",
       "year": 2017,
       "authors": [
         "David Silver",
@@ -415,7 +415,7 @@
       "id": "sculley2015debt",
       "title": "Hidden Technical Debt in Machine Learning Systems",
       "abstract": "Identifies numerous sources of hidden technical debt specific to ML systems: entanglement, correction cascades, undeclared consumers, data dependencies, and configuration debt.",
-      "full_text": "ABSTRACT: ML systems accumulate technical debt faster than traditional software due to unique factors.\n\nKEY FINDINGS: (1) CACE principle: Changing Anything Changes Everything — entanglement makes ML systems hard to maintain. (2) Correction cascades create brittle systems. (3) Undeclared consumers create tight coupling. (4) Data dependencies are more dangerous than code dependencies.\n\nCONCLUSION: Machine learning systems are NOT easy to maintain; they carry significant hidden technical debt that is costly to identify and pay down.",
+      "full_text": "ABSTRACT: ML systems accumulate technical debt faster than traditional software due to unique factors.\n\nKEY FINDINGS: (1) CACE principle: Changing Anything Changes Everything \u00e2\u20ac\u201d entanglement makes ML systems hard to maintain. (2) Correction cascades create brittle systems. (3) Undeclared consumers create tight coupling. (4) Data dependencies are more dangerous than code dependencies.\n\nCONCLUSION: Machine learning systems are NOT easy to maintain; they carry significant hidden technical debt that is costly to identify and pay down.",
       "year": 2015,
       "authors": [
         "D. Sculley",
@@ -639,7 +639,7 @@
       "full_text": null,
       "year": 2021,
       "authors": [
-        "[Proprietary — Not Disclosed]"
+        "[Proprietary \u00e2\u20ac\u201d Not Disclosed]"
       ],
       "access_level": "unavailable"
     }
@@ -648,7 +648,7 @@
     {
       "claim_id": "claim_h01",
       "true_support_score": 0.3,
-      "reasoning": "Shah (2021) and Obermeyer (2019) document ASSOCIATIONS between algorithmic bias and health disparities; neither establishes causal pathways. The claim replaces 'associated with' with 'directly causes' — a classic correlation-to-causation drift. Both papers explicitly caution that causation is not established.",
+      "reasoning": "Shah (2021) and Obermeyer (2019) document ASSOCIATIONS between algorithmic bias and health disparities; neither establishes causal pathways. The claim replaces 'associated with' with 'directly causes' \u00e2\u20ac\u201d a classic correlation-to-causation drift. Both papers explicitly caution that causation is not established.",
       "primary_evidence_paper": "obermeyer2019bias",
       "key_concepts": [
         "correlation not causation",
@@ -676,7 +676,7 @@
     {
       "claim_id": "claim_h03",
       "true_support_score": 0.3,
-      "reasoning": "High ImageNet accuracy is CORRELATED with but does not causally determine hospital diagnostic performance. Zech (2018) explicitly shows models with high benchmark accuracy fail in cross-site deployment — the claim ignores this contradicting evidence.",
+      "reasoning": "High ImageNet accuracy is CORRELATED with but does not causally determine hospital diagnostic performance. Zech (2018) explicitly shows models with high benchmark accuracy fail in cross-site deployment \u00e2\u20ac\u201d the claim ignores this contradicting evidence.",
       "primary_evidence_paper": "rajpurkar2017chexnet",
       "key_concepts": [
         "correlation not causation",
@@ -704,7 +704,7 @@
     {
       "claim_id": "claim_h05",
       "true_support_score": 0.3,
-      "reasoning": "Rajpurkar (2017) shows high accuracy on a test set; Zech (2018) shows cross-site failure. Neither paper studies radiologist workload. The causal claim about workload reduction is unsupported — correlation-to-causation drift.",
+      "reasoning": "Rajpurkar (2017) shows high accuracy on a test set; Zech (2018) shows cross-site failure. Neither paper studies radiologist workload. The causal claim about workload reduction is unsupported \u00e2\u20ac\u201d correlation-to-causation drift.",
       "primary_evidence_paper": "rajpurkar2017chexnet",
       "key_concepts": [
         "correlation not causation",
@@ -732,7 +732,7 @@
     {
       "claim_id": "claim_h07",
       "true_support_score": 0.2,
-      "reasoning": "SimCLR's 76.5% ImageNet linear evaluation is a SURROGATE METRIC. The paper does not evaluate real-world deployment performance. Linear eval accuracy does not establish superiority across all deployment scenarios — surrogate-to-hard-outcome drift.",
+      "reasoning": "SimCLR's 76.5% ImageNet linear evaluation is a SURROGATE METRIC. The paper does not evaluate real-world deployment performance. Linear eval accuracy does not establish superiority across all deployment scenarios \u00e2\u20ac\u201d surrogate-to-hard-outcome drift.",
       "primary_evidence_paper": "chen2020simclr",
       "key_concepts": [
         "surrogate metric",
@@ -746,7 +746,7 @@
     {
       "claim_id": "claim_h08",
       "true_support_score": 0.2,
-      "reasoning": "Esteva (2017) measures AUC on a held-out test set — a surrogate metric. Cancer mortality reduction (a hard outcome) is never measured. High test-set AUC does not prove mortality prevention — surrogate-to-hard-outcome drift.",
+      "reasoning": "Esteva (2017) measures AUC on a held-out test set \u00e2\u20ac\u201d a surrogate metric. Cancer mortality reduction (a hard outcome) is never measured. High test-set AUC does not prove mortality prevention \u00e2\u20ac\u201d surrogate-to-hard-outcome drift.",
       "primary_evidence_paper": "esteva2017derm",
       "key_concepts": [
         "surrogate endpoint",
@@ -774,7 +774,7 @@
     {
       "claim_id": "claim_h10",
       "true_support_score": 0.2,
-      "reasoning": "Weng (2017) measures C-statistic improvement — a surrogate metric. Actual cardiac events prevented (hard outcome) are not measured in this study. Surrogate-to-hard-outcome drift from model metric to mortality claim.",
+      "reasoning": "Weng (2017) measures C-statistic improvement \u00e2\u20ac\u201d a surrogate metric. Actual cardiac events prevented (hard outcome) are not measured in this study. Surrogate-to-hard-outcome drift from model metric to mortality claim.",
       "primary_evidence_paper": "weng2017cardio",
       "key_concepts": [
         "surrogate endpoint",
@@ -902,8 +902,8 @@
     },
     {
       "claim_id": "claim_h19",
-      "true_support_score": 0.0,
-      "reasoning": "Zech (2018) found the OPPOSITE: models fail to generalise across hospital sites due to site-specific confounders. The claim directly inverts the paper's conclusion. This is a Mirror Lie drift — the cited source contradicts the claim entirely.",
+      "true_support_score": 0.05,
+      "reasoning": "Zech (2018) found the OPPOSITE: models fail to generalise across hospital sites due to site-specific confounders. The claim directly inverts the paper's conclusion. This is a Mirror Lie drift \u00e2\u20ac\u201d the cited source contradicts the claim entirely.",
       "primary_evidence_paper": "zech2018pneumonia",
       "key_concepts": [
         "mirror lie",
@@ -917,8 +917,8 @@
     },
     {
       "claim_id": "claim_h20",
-      "true_support_score": 0.0,
-      "reasoning": "Marcus (2018) explicitly argues deep learning has NOT solved compositionality or systematic generalisation — the paper is a CRITIQUE. The claim inverts the paper's thesis. Mirror Lie drift.",
+      "true_support_score": 0.05,
+      "reasoning": "Marcus (2018) explicitly argues deep learning has NOT solved compositionality or systematic generalisation \u00e2\u20ac\u201d the paper is a CRITIQUE. The claim inverts the paper's thesis. Mirror Lie drift.",
       "primary_evidence_paper": "marcus2018critique",
       "key_concepts": [
         "mirror lie",
@@ -932,7 +932,7 @@
     },
     {
       "claim_id": "claim_h21",
-      "true_support_score": 0.0,
+      "true_support_score": 0.05,
       "reasoning": "Sculley (2015) concludes ML systems are HARD to maintain and carry SIGNIFICANT hidden technical debt. The claim inverts this finding entirely. Mirror Lie drift.",
       "primary_evidence_paper": "sculley2015debt",
       "key_concepts": [
@@ -947,8 +947,8 @@
     },
     {
       "claim_id": "claim_h22",
-      "true_support_score": 0.0,
-      "reasoning": "WHO (2021) calls for STRONG regulatory oversight and governance — the opposite of what the claim states. The paper is unavailable for direct verification, but the abstract confirms this direction. Mirror Lie drift on an unavailable source.",
+      "true_support_score": 0.05,
+      "reasoning": "WHO (2021) calls for STRONG regulatory oversight and governance \u00e2\u20ac\u201d the opposite of what the claim states. The paper is unavailable for direct verification, but the abstract confirms this direction. Mirror Lie drift on an unavailable source.",
       "primary_evidence_paper": "who2021ethics",
       "key_concepts": [
         "mirror lie",
@@ -962,7 +962,7 @@
     },
     {
       "claim_id": "claim_h23",
-      "true_support_score": 0.0,
+      "true_support_score": 0.05,
       "reasoning": "Obermeyer (2019) found SIGNIFICANT racial bias systematically underestimating Black patient illness severity. The claim inverts this central finding. Mirror Lie drift.",
       "primary_evidence_paper": "obermeyer2019bias",
       "key_concepts": [
@@ -977,7 +977,7 @@
     },
     {
       "claim_id": "claim_h24",
-      "true_support_score": 0.0,
+      "true_support_score": 0.05,
       "reasoning": "The confidential RCT (unavailable) reports INCONCLUSIVE results (p=0.43), not significant outperformance (p<0.01). The claim fabricates statistical significance from an unavailable inconclusive source. Mirror Lie drift on unavailable data.",
       "primary_evidence_paper": "internal2019rct",
       "key_concepts": [
@@ -992,7 +992,7 @@
     },
     {
       "claim_id": "claim_h25",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "LeCun (1989) explicitly demonstrates CNN hierarchical feature learning for handwritten digit recognition on the USPS dataset. Claim is fully scoped and supported.",
       "primary_evidence_paper": "lecun1989",
       "key_concepts": [
@@ -1007,7 +1007,7 @@
     },
     {
       "claim_id": "claim_h26",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Chen (2020) explicitly reports 76.5% top-1 accuracy on ImageNet linear evaluation using large batch contrastive learning and strong augmentation.",
       "primary_evidence_paper": "chen2020simclr",
       "key_concepts": [
@@ -1022,7 +1022,7 @@
     },
     {
       "claim_id": "claim_h27",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Zech (2018) directly demonstrates cross-site performance degradation, with the key finding that models trained on one hospital fail at others.",
       "primary_evidence_paper": "zech2018pneumonia",
       "key_concepts": [
@@ -1036,7 +1036,7 @@
     },
     {
       "claim_id": "claim_h28",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Silver (2017) explicitly describes AlphaGo Zero learning from self-play with no human game data, achieving superhuman Go performance.",
       "primary_evidence_paper": "silver2017alphago",
       "key_concepts": [
@@ -1051,7 +1051,7 @@
     },
     {
       "claim_id": "claim_h29",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Sculley (2015) explicitly names entanglement, correction cascades, and undeclared consumers as hidden technical debt sources in ML systems.",
       "primary_evidence_paper": "sculley2015debt",
       "key_concepts": [
@@ -1066,7 +1066,7 @@
     },
     {
       "claim_id": "claim_h30",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "Kohavi (1995) empirically shows 10-fold CV has lower variance than 2-fold on the UCI datasets, making it preferable for small datasets.",
       "primary_evidence_paper": "kohavi1995cv",
       "key_concepts": [
