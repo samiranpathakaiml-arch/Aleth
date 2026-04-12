@@ -24,6 +24,9 @@ COPY main.py         .
 COPY inference.py    .
 COPY openenv.yaml    .
 
+# Copy server package (alternative uvicorn entry point)
+COPY server/ ./server/
+
 # Copy benchmark data
 COPY data/ ./data/
 

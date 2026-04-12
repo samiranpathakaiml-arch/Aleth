@@ -2,6 +2,7 @@
 # Conforms to the OpenEnv benchmark protocol v1.0
 
 name: aleth
+entry_point: "uvicorn main:app --host 0.0.0.0 --port 7860"
 version: "1.1.0"
 description: >
   Aleth is a scientific citation verification benchmark.
@@ -103,7 +104,8 @@ observation_space:
 # ----------------------------------------------------------------
 # REWARD RANGE
 # ----------------------------------------------------------------
-reward_range: [-0.5, 2.0]
+# Episode-level grading score range (what grade_episode() returns)
+reward_range: [0.0, 1.0]
 
 reward_signals:
   relevant_read:         +0.02
@@ -134,12 +136,10 @@ grading:
 # BASELINE
 # ----------------------------------------------------------------
 baseline:
-  model: "claude-3-5-sonnet-20241022"
-  strategy: "state-aware sequential verification"
-  scores:
-    easy: 0.8720
-    medium: 0.7500
-    hard: 0.6200
+  model: "meta-llama/Llama-3.1-8B-Instruct"
+  strategy: "state-aware sequential verification via HTTP client"
   notes: >
-    Baseline verified on Easy task (0.8720) using OpenAI-compatible client. 
-    Medium and Hard tasks are implemented for adversarial testing of citation drift.
+    Run `python inference.py` with HF_TOKEN, API_BASE_URL, and MODEL_NAME set
+    to reproduce baseline scores. The inference script connects to the Aleth
+    FastAPI server (default: http://localhost:7860) and runs all 3 tasks.
+    Start the server first: `uvicorn main:app --host 0.0.0.0 --port 7860`

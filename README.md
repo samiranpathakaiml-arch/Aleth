@@ -42,21 +42,22 @@ The benchmark escalates across three difficulty tiers — from direct data match
 ## Directory Structure
 
 ```
-aleth/
-├── aleth/                    # Core Environment Package
-│   ├── models.py             # Pydantic schemas (Action, Observation, Reward)
-│   ├── environment.py        # AlethEnv (Step / Reset / State logic)
-│   ├── grader.py             # Deterministic grading (Accuracy, Reasoning, Drift)
-│   ├── reward.py             # Dense shaped reward computer
-│   └── data/                 # Benchmark Task Data
-│       ├── task_easy.json    # NLP Landmarks — Direct Verification
-│       ├── task_medium.json  # Multi-paper Synthesis & Paywall reasoning
-│       └── task_hard.json    # Adversarial Citation Drift
-├── inference.py              # Optimized Baseline Runner (OpenAI-compatible)
-├── openenv.yaml              # Official Environment Specification
-├── requirements.txt          # Dependencies (OpenAI, Pydantic, etc.)
-├── Dockerfile                # Containerized execution
-└── README.md
+aleth/                        # Project root
+├── main.py                   # FastAPI server (OpenEnv REST endpoints)
+├── environment.py            # AlethEnv (reset / step / state logic)
+├── models.py                 # Pydantic schemas (Action, Observation, Reward, State)
+├── grader.py                 # Deterministic grader (accuracy + reasoning + drift)
+├── reward.py                 # Dense shaped reward engine
+├── inference.py              # Baseline inference script (OpenAI-compatible)
+├── openenv.yaml              # Official environment specification
+├── requirements.txt          # Python dependencies
+├── Dockerfile                # Containerised execution
+├── server/
+│   └── app.py               # Alternative entry point (uvicorn server.app:app)
+└── data/                     # Benchmark task data
+    ├── task_easy.json        # 5 NLP Landmark claims (direct verification)
+    ├── task_medium.json      # 15 claims (multi-paper synthesis, abstract-only)
+    └── task_hard.json        # 30 adversarial claims (citation drift)
 ```
 
 ---
@@ -145,11 +146,22 @@ $$\text{Score} = 0.60 \times \text{Accuracy} + 0.30 \times \text{Reasoning} + 0.
 
 ## Baseline Performance
 
-| Task | Score | Model | Status |
+| Task | Expected Range | Model | Notes |
 |---|---|---|---|
-| Easy | `0.8720` | `claude-3-5-sonnet-20241022` | ✅ Verified |
-| Medium | `0.7500` | `meta-llama/Llama-3.1-8B` | 🔄 Estimated |
-| Hard | `0.6200` | `meta-llama/Llama-3.1-8B` | 🔄 Estimated |
+| **Easy** | `0.70 – 0.90` | `meta-llama/Llama-3.1-8B-Instruct` | Reproducible via `inference.py` |
+| **Medium** | `0.50 – 0.75` | `meta-llama/Llama-3.1-8B-Instruct` | Multi-paper synthesis |
+| **Hard** | `0.30 – 0.60` | `meta-llama/Llama-3.1-8B-Instruct` | Adversarial citation drift |
+
+Run the full baseline yourself:
+```bash
+# 1. Start the server
+uvicorn main:app --host 0.0.0.0 --port 7860
+
+# 2. In a separate terminal, run the baseline
+export HF_TOKEN="your_token"
+export MODEL_NAME="meta-llama/Llama-3.1-8B-Instruct"
+python inference.py
+```
 
 ---
 
