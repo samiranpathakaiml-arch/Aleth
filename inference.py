@@ -321,10 +321,11 @@ def run_episode(
             if done:
                 break
 
-        # Normalise cumulative reward to [0, 1]
-        score = sum(rewards) / max_reward if max_reward > 0 else 0.0
-        score = min(max(score, 0.0), 1.0)
-        success = score >= SUCCESS_SCORE_THRESHOLD
+        # Normalise cumulative reward — clamp strictly within (0, 1) exclusive
+        # as required by the platform validator (0.0 and 1.0 are rejected)
+        raw_score = sum(rewards) / max_reward if max_reward > 0 else 0.001
+        score     = min(max(raw_score, 0.001), 0.999)
+        success   = score >= SUCCESS_SCORE_THRESHOLD
 
     finally:
         log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
