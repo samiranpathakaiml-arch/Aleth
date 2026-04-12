@@ -123,9 +123,11 @@ class AlethLocalClient:
         # When done, return the grader's final_score (not the dense step reward)
         # so the interface is consistent with AlethHTTPClient / main.py
         if done and "final_score" in info:
-            step_reward = float(info["final_score"])
+            raw = float(info["final_score"])
         else:
-            step_reward = float(reward.total) if reward is not None else 0.0
+            raw = float(reward.total) if reward is not None else 0.001
+        # Clamp ALL rewards to (0.001, 0.999) — platform rejects 0.0 and 1.0
+        step_reward = max(0.001, min(0.999, raw))
         return {
             "observation": obs.model_dump(mode="json"),
             "reward":      step_reward,
