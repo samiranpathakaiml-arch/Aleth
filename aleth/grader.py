@@ -14,6 +14,19 @@ from typing import Dict
 from .models import State, GroundTruth, Verification
 
 
+# ---------------------------------------------------------------------------
+# Platform requirement: task scores must be STRICTLY between 0 and 1
+# (not 0.0, not 1.0). Clamp every score to this open interval.
+# ---------------------------------------------------------------------------
+_SCORE_MIN: float = 0.001
+_SCORE_MAX: float = 0.999
+
+
+def _clamp(score: float) -> float:
+    """Clamp score to open interval (0, 1) as required by submission validator."""
+    return max(_SCORE_MIN, min(_SCORE_MAX, score))
+
+
 class AlethGrader:
     """
     Deterministic episode grader.
@@ -35,21 +48,23 @@ class AlethGrader:
 
         For each claim in ground_truth:
           - If verified: call grade_claim()
-          - If unverified: score = 0.0
+          - If unverified: score = _SCORE_MIN (never exactly 0.0)
 
         Returns:
-            float: Average claim score in [0.0, 1.0]
+            float: Average claim score, strictly within (0, 1).
         """
         if not self.ground_truth:
-            return 0.0
+            return _SCORE_MIN
 
         total_score = 0.0
         for claim_id in self.ground_truth:
             if claim_id in state.verifications:
                 total_score += self.grade_claim(claim_id, state.verifications[claim_id])
-            # else: 0.0 for unverified
+            else:
+                total_score += _SCORE_MIN  # unverified — floor, never exactly 0.0
 
-        return round(total_score / len(self.ground_truth), 6)
+        raw = round(total_score / len(self.ground_truth), 6)
+        return _clamp(raw)
 
     def grade_claim(self, claim_id: str, verification: Verification) -> float:
         """
@@ -65,7 +80,7 @@ class AlethGrader:
             verification: The agent's submitted Verification object
 
         Returns:
-            float: Claim score in [0.0, 1.0]
+            float: Claim score, strictly within (0, 1).
         """
         gt = self.ground_truth[claim_id]
 
@@ -79,7 +94,8 @@ class AlethGrader:
         # 3. Drift detection accuracy (10%)
         drift_score = 1.0 if verification.flagged_drift == gt.has_citation_drift else 0.0
 
-        return round(0.6 * accuracy + 0.3 * reasoning_score + 0.1 * drift_score, 6)
+        raw = round(0.6 * accuracy + 0.3 * reasoning_score + 0.1 * drift_score, 6)
+        return _clamp(raw)
 
     def get_detailed_breakdown(self, state: State) -> Dict:
         """
@@ -93,7 +109,7 @@ class AlethGrader:
         for claim_id, gt in self.ground_truth.items():
             if claim_id not in state.verifications:
                 breakdown[claim_id] = {
-                    "total": 0.0,
+                    "total": _SCORE_MIN,
                     "note": "Not verified",
                 }
                 continue

@@ -88,7 +88,7 @@
   "ground_truth": [
     {
       "claim_id": "claim_001",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "The paper explicitly states 'BERT-Large achieves a score of 93.2% on the overall GLUE benchmark' in the Results section. The claim is an exact match.",
       "primary_evidence_paper": "devlin2019",
       "key_concepts": ["93.2", "glue", "accuracy"],
@@ -97,7 +97,7 @@
     },
     {
       "claim_id": "claim_002",
-      "true_support_score": 0.0,
+      "true_support_score": 0.05,
       "reasoning": "The paper clearly states GPT-3 has 175 billion parameters, not over 200 billion. The claim is a factual overclaim not supported by the citation.",
       "primary_evidence_paper": "brown2020",
       "key_concepts": ["175 billion", "parameters"],
@@ -106,7 +106,7 @@
     },
     {
       "claim_id": "claim_003",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "The paper explicitly describes the Transformer as 'relying entirely on an attention mechanism' and details multi-head self-attention in the Model Architecture section. The claim is fully supported.",
       "primary_evidence_paper": "vaswani2017",
       "key_concepts": ["self-attention", "attention mechanism", "without recurrence"],
@@ -124,7 +124,7 @@
     },
     {
       "claim_id": "claim_005",
-      "true_support_score": 1.0,
+      "true_support_score": 0.95,
       "reasoning": "The paper clearly states 'we randomly drop units from the neural network during training' and confirms this prevents overfitting. The claim is fully supported.",
       "primary_evidence_paper": "srivastava2014",
       "key_concepts": ["randomly", "drop", "training", "overfitting"],
