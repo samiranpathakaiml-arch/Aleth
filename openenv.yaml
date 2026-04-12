@@ -50,7 +50,7 @@ action_space:
           required: true
         support_score:
           type: float
-          range: [0.0, 1.0]
+          range: [0.001, 0.999]
           required: true
         reasoning:
           type: string
@@ -105,8 +105,8 @@ observation_space:
 # REWARD RANGE
 # ----------------------------------------------------------------
 # Terminal episode score (reward when done=True) is strictly within (0.001, 0.999).
-# Per-step dense rewards can be negative (penalties). The graded task score is [0, 1].
-reward_range: [0.0, 1.0]
+# Per-step dense rewards are clamped to the same interval.
+reward_range: [0.001, 0.999]
 
 reward_signals:
   relevant_read:         +0.02
@@ -127,7 +127,7 @@ reward_signals:
 grading:
   metric: average_claim_score
   formula: "mean over all claims of: 0.6*accuracy + 0.3*reasoning + 0.1*drift"
-  range: [0.0, 1.0]
+  range: [0.05, 0.95]
   breakdown:
     accuracy:    0.60  # |agent_score - gt_score| penalised linearly
     reasoning:   0.30  # fraction of key concepts present in reasoning
