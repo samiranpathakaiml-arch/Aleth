@@ -119,11 +119,17 @@ class AlethLocalClient:
         return {"observation": obs.model_dump(mode="json"), "reward": None, "done": False}
 
     def step(self, action: Dict[str, Any]) -> Dict[str, Any]:
-        obs, reward, done, _info = self._env.step(action)
+        obs, reward, done, info = self._env.step(action)
+        # When done, return the grader's final_score (not the dense step reward)
+        # so the interface is consistent with AlethHTTPClient / main.py
+        if done and "final_score" in info:
+            step_reward = float(info["final_score"])
+        else:
+            step_reward = float(reward.total) if reward is not None else 0.0
         return {
             "observation": obs.model_dump(mode="json"),
-            "reward": float(reward.total) if reward is not None else 0.0,
-            "done": done,
+            "reward":      step_reward,
+            "done":        done,
         }
 
     def get_claims(self) -> Dict[str, Dict]:
@@ -226,16 +232,17 @@ def run_episode(
     max_steps  = _TASK_MAX_STEPS.get(task, 50)
     max_reward = _TASK_MAX_REWARD.get(task, 5.0)
 
-    rewards:     List[float] = []
-    steps_taken: int         = 0
-    score:       float       = 0.001
-    success:     bool        = False
+    rewards:      List[float] = []
+    steps_taken:  int         = 0
+    score:        float       = 0.001
+    grader_score: float       = 0.001   # updated by do_step when done=True
+    success:      bool        = False
 
     log_start(task=task, env=BENCHMARK, model=MODEL_NAME)
 
     # ── helper: execute one environment step and log it ───────────────────────
     def do_step(action: Dict[str, Any]) -> tuple:
-        nonlocal steps_taken
+        nonlocal steps_taken, grader_score
         reward_val: float         = 0.0
         error_msg:  Optional[str] = None
         done_flag                 = False
@@ -245,6 +252,9 @@ def run_episode(
             obs_out   = result.get("observation", {})
             reward_val = float(result.get("reward") or 0.0)
             done_flag  = result.get("done", False)
+            # When the episode ends, the reward IS the grader's episode score
+            if done_flag:
+                grader_score = reward_val
         except Exception as exc:
             error_msg = str(exc)
             done_flag = True
@@ -318,10 +328,12 @@ def run_episode(
         if not done:
             do_step({"action_type": "submit"})
 
-        # ── normalise score (strictly within (0, 1) exclusive) ────────────────
-        raw_score = sum(rewards) / max_reward if max_reward > 0 else 0.001
-        score     = min(max(raw_score, 0.001), 0.999)
-        success   = score >= SUCCESS_SCORE_THRESHOLD
+        # ── score: use grader's terminal score directly ───────────────────────
+        # grader_score is captured by do_step from the done=True step's reward.
+        # Both AlethHTTPClient and AlethLocalClient return final_score on done.
+        score   = min(max(grader_score, 0.001), 0.999)
+        success = score >= SUCCESS_SCORE_THRESHOLD
+
 
     finally:
         log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
