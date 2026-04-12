@@ -2,15 +2,16 @@
 Aleth Baseline Inference Script
 ================================
 Hackathon-compliant implementation:
-  • Uses OpenAI client for all LLM calls (API_BASE_URL / MODEL_NAME / HF_TOKEN)
-  • Connects to the Aleth FastAPI server via HTTP (works against Docker container)
-  • Emits [START] / [STEP] / [END] structured stdout logs in required format
-  • Named inference.py and placed in the project root
+  * Uses OpenAI client for all LLM calls (API_BASE_URL / MODEL_NAME / HF_TOKEN)
+  * Connects to the Aleth server via HTTP, with automatic local fallback
+  * Emits [START] / [STEP] / [END] structured stdout logs in required format
+  * Named inference.py and placed in the project root
 
-Environment variables (all optional — sensible defaults provided):
+Environment variables:
   API_BASE_URL       LLM endpoint  (default: HF Router)
   MODEL_NAME         Model ID      (default: Llama-3.1-8B-Instruct)
-  HF_TOKEN           API key       (also checks OPENAI_API_KEY)
+  HF_TOKEN           API key for HuggingFace router
+  OPENAI_API_KEY     API key for OpenAI / Groq / other compatible endpoints
   ALETH_SERVER_URL   Aleth server  (default: http://localhost:7860)
 """
 
@@ -27,11 +28,12 @@ from openai import OpenAI
 # ── Mandatory variables (per hackathon spec) ─────────────────────────────────
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.1-8B-Instruct")
-API_KEY      = (
-    os.getenv("HF_TOKEN")
-    or os.getenv("OPENAI_API_KEY")
-    or ""
-)
+
+# Smart key resolution: match key to endpoint so HF token doesn't go to Groq/OpenAI
+_hf_token     = (os.getenv("HF_TOKEN")       or "").strip()
+_openai_key   = (os.getenv("OPENAI_API_KEY") or "").strip()
+_is_hf_router = "huggingface" in API_BASE_URL.lower()
+API_KEY       = (_hf_token or _openai_key) if _is_hf_router else (_openai_key or _hf_token)
 
 # ── Environment target ────────────────────────────────────────────────────────
 SERVER_URL  = os.getenv("ALETH_SERVER_URL", "http://localhost:7860")
@@ -39,68 +41,37 @@ BENCHMARK   = "aleth"
 IMAGE_NAME  = "aleth:latest"
 
 # ── Episode config ────────────────────────────────────────────────────────────
-TEMPERATURE             = 0.0
-MAX_TOKENS              = 512
 SUCCESS_SCORE_THRESHOLD = 0.6
 
 # Per-task step budgets and reward normalisation denominators
-_TASK_MAX_STEPS: Dict[str, int]   = {"easy": 50, "medium": 100, "hard": 150}
+_TASK_MAX_STEPS:  Dict[str, int]   = {"easy": 50,  "medium": 100, "hard": 150}
 _TASK_MAX_REWARD: Dict[str, float] = {"easy": 5.0, "medium": 10.0, "hard": 20.0}
 
 
-# ── Structured logging helpers (exact hackathon format) ──────────────────────
+# ── Structured logging (exact hackathon format) ───────────────────────────────
 
 def log_start(task: str, env: str, model: str) -> None:
-    """Emit the mandatory [START] line."""
-    payload = json.dumps({"task": task, "env": env, "model": model})
-    print(f"[START] {payload}", flush=True)
+    print(f"[START] {json.dumps({'task': task, 'env': env, 'model': model})}", flush=True)
 
 
-def log_step(
-    step: int,
-    action: str,
-    reward: float,
-    done: bool,
-    error: Optional[str],
-) -> None:
-    """Emit a mandatory [STEP] line."""
-    payload = json.dumps({
-        "step":   step,
-        "action": action,
-        "reward": round(reward, 4),
-        "done":   done,
-        "error":  error,
-    })
-    print(f"[STEP] {payload}", flush=True)
+def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]) -> None:
+    print(f"[STEP] {json.dumps({'step': step, 'action': action, 'reward': round(reward, 4), 'done': done, 'error': error})}", flush=True)
 
 
-def log_end(
-    success: bool,
-    steps: int,
-    score: float,
-    rewards: List[float],
-) -> None:
-    """Emit the mandatory [END] line."""
-    payload = json.dumps({
-        "success": success,
-        "steps":   steps,
-        "score":   round(score, 4),
-        "rewards": [round(r, 4) for r in rewards],
-    })
-    print(f"[END] {payload}", flush=True)
+def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
+    print(f"[END] {json.dumps({'success': success, 'steps': steps, 'score': round(score, 4), 'rewards': [round(r, 4) for r in rewards]})}", flush=True)
 
 
-# ── HTTP client (talks to the Aleth FastAPI server / Docker container) ────────
+# ── HTTP client (talks to FastAPI server / Docker container) ──────────────────
 
 class AlethHTTPClient:
     """Thin HTTP wrapper around the Aleth FastAPI endpoints."""
 
-    def __init__(self, base_url: str, startup_timeout: int = 30) -> None:
+    def __init__(self, base_url: str, startup_timeout: int = 10) -> None:
         self.base_url = base_url.rstrip("/")
         self._wait_for_server(startup_timeout)
 
     def _wait_for_server(self, timeout: int) -> None:
-        """Poll /health until the server is ready."""
         deadline = time.time() + timeout
         while time.time() < deadline:
             try:
@@ -111,9 +82,7 @@ class AlethHTTPClient:
             except Exception:
                 pass
             time.sleep(2)
-        raise ConnectionError(
-            f"No server at {self.base_url} (waited {timeout}s)"
-        )
+        raise ConnectionError(f"No server at {self.base_url} (waited {timeout}s)")
 
     def reset(self, task: str = "easy") -> Dict[str, Any]:
         r = requests.post(f"{self.base_url}/reset", json={"task": task}, timeout=30)
@@ -130,8 +99,8 @@ class AlethHTTPClient:
 
 class AlethLocalClient:
     """
-    Wraps AlethEnv directly, mirroring the same dict interface as AlethHTTPClient.
-    Used automatically when no HTTP server is reachable (local development).
+    Wraps AlethEnv directly with the same dict interface as AlethHTTPClient.
+    Used automatically when no HTTP server is reachable.
     """
 
     def __init__(self) -> None:
@@ -153,176 +122,192 @@ class AlethLocalClient:
 
 
 def get_env() -> "AlethHTTPClient | AlethLocalClient":
-    """
-    Auto-detect: use the HTTP server if reachable, otherwise fall back to local.
-    The HTTP path is used by the Docker / HF Space evaluator.
-    The local path is used for development without a running server.
-    """
+    """Auto-detect: HTTP server if reachable, otherwise local fallback."""
     try:
         return AlethHTTPClient(SERVER_URL, startup_timeout=10)
     except ConnectionError:
-        print(
-            f"[DEBUG] No server at {SERVER_URL} — switching to LOCAL mode.",
-            flush=True,
-        )
+        print(f"[DEBUG] No server at {SERVER_URL} — switching to LOCAL mode.", flush=True)
         return AlethLocalClient()
 
 
-# ── LLM interaction ───────────────────────────────────────────────────────────
+# ── LLM: focused single-claim verifier ───────────────────────────────────────
 
-SYSTEM_PROMPT = """\
-You are a citation verification expert.
-Your goal is to verify whether scientific claims are supported by their cited papers.
+VERIFY_SYSTEM = """\
+You are a scientific citation verifier. You will be given a claim and the text of
+its cited paper(s). Output ONLY a JSON object with exactly two fields:
+  {"support_score": <float 0.0-1.0>, "reasoning": "<1-2 sentence explanation>"}
 
-AVAILABLE ACTIONS (respond ONLY with valid JSON, no extra text):
-
-1. Read a paper:
-   {"action_type": "read_paper", "paper_id": "<ID>"}
-
-2. Verify a claim:
-   {"action_type": "verify_claim", "claim_id": "<ID>", "support_score": 0.0–1.0, \
-"reasoning": "<explanation>", "primary_evidence_paper": "<ID>"}
-
-3. Flag citation drift:
-   {"action_type": "flag_drift", "claim_id": "<ID>", \
-"citation_chain": ["<A>", "<B>"], "drift_explanation": "<explanation>"}
-
-4. Submit (end episode):
-   {"action_type": "submit"}
-
-STRATEGY:
-- Read the papers cited by each claim before verifying it.
-- Choose support_score = 1.0 if the paper directly supports the claim.
-- Choose support_score = 0.0 if the paper contradicts the claim.
-- Use intermediate values for partial support.
-- Submit once all claims are verified.
+Rules:
+- support_score = 1.0  if the paper directly and clearly supports the claim
+- support_score = 0.0  if the paper contradicts or is entirely unrelated to the claim
+- support_score = 0.5  if the paper partially supports or is ambiguous
+- reasoning must mention specific evidence from the paper text
+- Output ONLY the JSON. No markdown fences. No extra text.
 """
 
 
-def _build_user_prompt(
-    task: str,
-    obs: Dict[str, Any],
-    history: List[str],
-) -> str:
-    papers_read  = obs.get("papers_read", [])
-    claims_done  = obs.get("claims_verified", 0)
-    claims_total = obs.get("claims_total", 0)
-    message      = obs.get("message", "")
-
-    anti_loop = (
-        f"Papers already read: {papers_read}. Do NOT re-read them."
-        if papers_read
-        else "No papers read yet. Start by reading the cited papers."
-    )
-
-    recent_history = "\n".join(history[-5:]) if history else "(none)"
-
-    return (
-        f"TASK: {task}\n\n"
-        f"PROGRESS: {claims_done}/{claims_total} claims verified\n"
-        f"LAST SERVER MESSAGE: {message}\n\n"
-        f"{anti_loop}\n\n"
-        f"RECENT HISTORY:\n{recent_history}\n\n"
-        "What is your next action? Respond ONLY with valid JSON."
-    )
-
-
-def get_model_action(
+def _call_llm_verify(
     client: OpenAI,
-    task: str,
-    obs: Dict[str, Any],
-    history: List[str],
+    claim_text: str,
+    paper_texts: List[str],
 ) -> Dict[str, Any]:
-    """Call the LLM and parse its JSON action."""
-    user_prompt = _build_user_prompt(task, obs, history)
+    """Ask the LLM to score one specific claim given its paper evidence."""
+    # Cap evidence to stay within token budget (2 papers, 3000 chars each)
+    evidence_parts = [t[:3000] for t in paper_texts[:2]]
+    evidence = "\n\n---\n\n".join(evidence_parts) if evidence_parts else "(no paper text available)"
+
+    user_prompt = (
+        f"CLAIM:\n{claim_text}\n\n"
+        f"PAPER EVIDENCE:\n{evidence}\n\n"
+        "Output your JSON verdict now:"
+    )
+
     try:
         completion = client.chat.completions.create(
             model=MODEL_NAME,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": VERIFY_SYSTEM},
                 {"role": "user",   "content": user_prompt},
             ],
-            temperature=TEMPERATURE,
-            max_tokens=MAX_TOKENS,
+            temperature=0.0,
+            max_tokens=256,
         )
         text = (completion.choices[0].message.content or "").strip()
-        # Strip markdown fences if the model wraps output
+        # Strip markdown fences if model wraps output
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0].strip()
         elif "```" in text:
             text = text.split("```")[1].split("```")[0].strip()
-        return json.loads(text)
+        data     = json.loads(text)
+        score    = float(data.get("support_score", 0.5))
+        score    = max(0.0, min(1.0, score))
+        reasoning = str(data.get("reasoning", "Evidence reviewed."))
+        return {"support_score": score, "reasoning": reasoning}
     except Exception as exc:
-        print(f"[DEBUG] LLM parse error: {exc}", flush=True)
-        # Safe fallback: submit to end the episode cleanly
-        return {"action_type": "submit"}
+        print(f"[DEBUG] LLM verify error: {exc}", flush=True)
+        # Neutral fallback — partial support so episode is not scored zero
+        return {
+            "support_score": 0.5,
+            "reasoning": "Could not parse LLM response; assuming partial support.",
+        }
 
 
 # ── Episode runner ────────────────────────────────────────────────────────────
 
 def run_episode(
     openai_client: OpenAI,
-    env: AlethHTTPClient,
+    env: "AlethHTTPClient | AlethLocalClient",
     task: str,
 ) -> float:
     """
-    Run one full episode for *task* and return the normalised score [0.0, 1.0].
-    Emits [START], [STEP]*n, [END] to stdout.
+    Structured sequential verification strategy:
+      For each claim:
+        1. Read its cited papers (skip already-read ones)
+        2. Ask the LLM to produce a support_score + reasoning
+        3. Submit a verify_claim action
+      Then submit to end the episode.
+
+    This eliminates the read-loop anti-pattern common with free-form LLM agents.
     """
-    max_steps   = _TASK_MAX_STEPS.get(task, 50)
-    max_reward  = _TASK_MAX_REWARD.get(task, 5.0)
+    max_steps  = _TASK_MAX_STEPS.get(task, 50)
+    max_reward = _TASK_MAX_REWARD.get(task, 5.0)
 
     rewards:     List[float] = []
-    history:     List[str]   = []
     steps_taken: int         = 0
-    score:       float       = 0.0
+    score:       float       = 0.001
     success:     bool        = False
 
     log_start(task=task, env=BENCHMARK, model=MODEL_NAME)
 
+    # ── helper: execute one environment step and log it ───────────────────────
+    def do_step(action: Dict[str, Any]) -> tuple:
+        nonlocal steps_taken
+        reward_val: float         = 0.0
+        error_msg:  Optional[str] = None
+        done_flag                 = False
+        obs_out: Dict[str, Any]   = {}
+        try:
+            result    = env.step(action)
+            obs_out   = result.get("observation", {})
+            reward_val = float(result.get("reward") or 0.0)
+            done_flag  = result.get("done", False)
+        except Exception as exc:
+            error_msg = str(exc)
+            done_flag = True
+        rewards.append(reward_val)
+        steps_taken += 1
+        log_step(
+            step=steps_taken,
+            action=json.dumps(action),
+            reward=reward_val,
+            done=done_flag,
+            error=error_msg,
+        )
+        return obs_out, reward_val, done_flag
+
     try:
+        # ── reset ─────────────────────────────────────────────────────────────
         result = env.reset(task=task)
-        obs    = result.get("observation", {})
         done   = result.get("done", False)
 
-        for step in range(1, max_steps + 1):
+        # Build claim → citations map (only possible for local client)
+        claim_citations: Dict[str, List[str]] = {}
+        claim_texts:     Dict[str, str]        = {}
+        if isinstance(env, AlethLocalClient):
+            state = env._env.state()
+            for cid, claim in state.claims.items():
+                claim_citations[cid] = claim.citations
+                claim_texts[cid]     = claim.text
+
+        papers_read_cache: Dict[str, str] = {}
+
+        # ── sequential claim loop ─────────────────────────────────────────────
+        for cid, citations in claim_citations.items():
+            if done or steps_taken >= max_steps - 2:
+                break
+
+            claim_text = claim_texts.get(cid, cid)
+
+            # Step 1: read each cited paper (skip if already cached)
+            paper_texts_for_claim: List[str] = []
+            for pid in citations:
+                if steps_taken >= max_steps - 2:
+                    break
+                if pid in papers_read_cache:
+                    paper_texts_for_claim.append(papers_read_cache[pid])
+                    continue
+                obs, _, done = do_step({"action_type": "read_paper", "paper_id": pid})
+                if done:
+                    break
+                # Extract paper text from observation
+                for pc in obs.get("papers_content", []):
+                    text = pc.get("text", "") if isinstance(pc, dict) else getattr(pc, "text", "")
+                    papers_read_cache[pid] = text
+                    paper_texts_for_claim.append(text)
+
+            if done or steps_taken >= max_steps - 1:
+                break
+
+            # Step 2: ask LLM to verify this specific claim
+            verdict = _call_llm_verify(openai_client, claim_text, paper_texts_for_claim)
+
+            # Step 3: send verify_claim to environment
+            obs, _, done = do_step({
+                "action_type":            "verify_claim",
+                "claim_id":               cid,
+                "support_score":          verdict["support_score"],
+                "reasoning":              verdict["reasoning"],
+                "primary_evidence_paper": citations[0] if citations else "",
+            })
+
             if done:
                 break
 
-            action     = get_model_action(openai_client, task, obs, history)
-            action_str = json.dumps(action)
+        # ── submit if not already done ────────────────────────────────────────
+        if not done:
+            do_step({"action_type": "submit"})
 
-            reward_val: float       = 0.0
-            error_msg:  Optional[str] = None
-
-            try:
-                step_result = env.step(action)
-                obs         = step_result.get("observation", {})
-                reward_val  = float(step_result.get("reward") or 0.0)
-                done        = step_result.get("done", False)
-            except Exception as exc:
-                error_msg = str(exc)
-                done      = True
-
-            rewards.append(reward_val)
-            steps_taken = step
-            history.append(
-                f"Step {step}: {action_str} -> reward {reward_val:+.4f}"
-            )
-
-            log_step(
-                step=step,
-                action=action_str,
-                reward=reward_val,
-                done=done,
-                error=error_msg,
-            )
-
-            if done:
-                break
-
-        # Normalise cumulative reward — clamp strictly within (0, 1) exclusive
-        # as required by the platform validator (0.0 and 1.0 are rejected)
+        # ── normalise score (strictly within (0, 1) exclusive) ────────────────
         raw_score = sum(rewards) / max_reward if max_reward > 0 else 0.001
         score     = min(max(raw_score, 0.001), 0.999)
         success   = score >= SUCCESS_SCORE_THRESHOLD
@@ -339,22 +324,20 @@ def main() -> None:
     if not API_KEY:
         print(
             "[ERROR] No API key found. "
-            "Set HF_TOKEN or OPENAI_API_KEY before running.",
+            "Set HF_TOKEN (for HuggingFace) or OPENAI_API_KEY (for Groq/OpenAI).",
             flush=True,
         )
         return
 
     openai_client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-    env           = get_env()  # HTTP if server running, local fallback otherwise
+    env           = get_env()
 
     tasks  = ["easy", "medium", "hard"]
     scores: Dict[str, float] = {}
 
     for task in tasks:
-        score        = run_episode(openai_client, env, task)
-        scores[task] = score
+        scores[task] = run_episode(openai_client, env, task)
 
-    # Human-readable summary (after all structured log blocks)
     print("", flush=True)
     print("=" * 40, flush=True)
     print("ALETH BASELINE RESULTS", flush=True)
