@@ -94,6 +94,12 @@ class AlethHTTPClient:
         r.raise_for_status()
         return r.json()
 
+    def get_claims(self) -> Dict[str, Dict]:
+        """Return {claim_id: {text, citations}} from the server's /state endpoint."""
+        r = requests.get(f"{self.base_url}/state", timeout=30)
+        r.raise_for_status()
+        return r.json().get("claims", {})
+
 
 # ── Local fallback client (direct Python import — no server needed) ───────────
 
@@ -118,6 +124,14 @@ class AlethLocalClient:
             "observation": obs.model_dump(mode="json"),
             "reward": float(reward.total) if reward is not None else 0.0,
             "done": done,
+        }
+
+    def get_claims(self) -> Dict[str, Dict]:
+        """Return {claim_id: {text, citations}} directly from the local environment."""
+        state = self._env.state()
+        return {
+            cid: {"text": claim.text, "citations": claim.citations}
+            for cid, claim in state.claims.items()
         }
 
 
@@ -250,14 +264,11 @@ def run_episode(
         result = env.reset(task=task)
         done   = result.get("done", False)
 
-        # Build claim → citations map (only possible for local client)
-        claim_citations: Dict[str, List[str]] = {}
-        claim_texts:     Dict[str, str]        = {}
-        if isinstance(env, AlethLocalClient):
-            state = env._env.state()
-            for cid, claim in state.claims.items():
-                claim_citations[cid] = claim.citations
-                claim_texts[cid]     = claim.text
+        # Get claims via the shared get_claims() interface.
+        # Works for both HTTP mode (calls /state) and local mode (reads env directly).
+        claims_data = env.get_claims()   # {cid: {"text": ..., "citations": [...]}}
+        claim_citations: Dict[str, List[str]] = {cid: v["citations"] for cid, v in claims_data.items()}
+        claim_texts:     Dict[str, str]        = {cid: v["text"]      for cid, v in claims_data.items()}
 
         papers_read_cache: Dict[str, str] = {}
 

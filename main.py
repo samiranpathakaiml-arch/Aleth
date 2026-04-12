@@ -145,18 +145,30 @@ async def step(req: StepRequest):
 
 
 @app.get("/state")
-async def state():
-    """Return the current environment state."""
+async def get_state():
+    """
+    Return the current task's claims and their cited paper IDs.
+    Used by inference.py to build the sequential verification plan.
+    """
     global _env
     if _env is None:
-        raise HTTPException(status_code=400, detail="Call /reset first.")
+        raise HTTPException(status_code=400, detail="Call /reset before /state.")
     try:
-        return _env.state().model_dump(mode="json")
-    except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        state = _env.state()
+        return {
+            "claims": {
+                cid: {
+                    "text":      claim.text,
+                    "citations": claim.citations,
+                }
+                for cid, claim in state.claims.items()
+            }
+        }
     except Exception as exc:
         logger.exception(f"/state unexpected error: {exc}")
         raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
+
+
 
 
 @app.get("/health")
