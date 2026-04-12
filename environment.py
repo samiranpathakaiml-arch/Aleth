@@ -156,7 +156,7 @@ class AlethEnv:
             return self._obs(f"Error: claim '{cid}' not found. "
                              f"Available: {list(self._state.claims)}", [], None), info
 
-        score = max(0.0, min(1.0, action.support_score))
+        score = max(0.001, min(0.999, action.support_score))
         self._state.verifications[cid] = Verification(
             claim_id=cid, support_score=score, reasoning=action.reasoning,
             primary_evidence_paper=action.primary_evidence_paper,
