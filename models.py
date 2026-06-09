@@ -135,3 +135,68 @@ class State(BaseModel):
     step_count:    int = 0
     max_steps:     Optional[int] = None
     episode_done:  bool = False
+
+
+# ── Chronicle (Session History & Tips) ─────────────────────────────────────────
+
+class SessionRecord(BaseModel):
+    """Single session/episode metrics."""
+    session_id:        str
+    task_difficulty:   str  # easy, medium, hard
+    timestamp:         str  # ISO format
+    total_steps:       int
+    papers_read_count: int
+    claims_verified:   int
+    claims_total:      int
+    final_score:       float  # episode grade (0-1)
+    accuracy_score:    float  # accuracy component
+    reasoning_score:   float  # reasoning component
+    drift_score:       float  # drift detection component
+    papers_read:       List[str] = Field(default_factory=list)
+    claim_scores:      Dict[str, float] = Field(default_factory=dict)  # claim_id -> score
+    reasonings:        Dict[str, str] = Field(default_factory=dict)  # claim_id -> reasoning
+    claim_types:       Dict[str, str] = Field(default_factory=dict)  # claim_id -> type
+
+
+class UserProfile(BaseModel):
+    """Aggregated user statistics across all sessions."""
+    total_sessions:     int
+    avg_accuracy:       float
+    avg_reasoning:      float
+    avg_drift_detection: float
+    avg_papers_per_session: float
+    avg_steps_per_session: float
+    best_difficulty:    Optional[str] = None
+    weakest_difficulty: Optional[str] = None
+    empirical_accuracy: float
+    methodological_accuracy: float
+    theoretical_accuracy: float
+    total_claims_verified: int
+    task_completion_rate: float  # % of claims verified when submitted
+
+
+class TipPriority(str, Enum):
+    HIGH   = "high"
+    MEDIUM = "medium"
+    LOW    = "low"
+
+
+class TipRecommendation(BaseModel):
+    """Personalized tip based on usage patterns."""
+    tip_id:       str
+    title:        str
+    description:  str
+    priority:     TipPriority
+    category:     str  # efficiency, accuracy, reasoning, difficulty_progression, drift_detection
+    evidence:     str  # why this tip is recommended
+    suggested_action: str  # concrete next step
+
+
+class ChronicleResponse(BaseModel):
+    """Response from /chronicle/tips endpoint."""
+    profile:      UserProfile
+    recent_sessions: List[SessionRecord]
+    strengths:    List[str]
+    weaknesses:   List[str]
+    tips:         List[TipRecommendation]
+    next_target:  Optional[str] = None  # suggested difficulty or claim type

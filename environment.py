@@ -9,6 +9,7 @@ OpenEnv API:
 """
 
 import json
+import uuid
 from typing import Dict, Tuple, Any, Optional
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from models import (                                  # absolute import
 )
 from grader import AlethGrader                        # absolute import
 from reward import AlethRewardComputer                # absolute import
+from chronicle import ChronicleService                # absolute import
 
 
 class AlethEnv:
@@ -40,6 +42,9 @@ class AlethEnv:
         self._state:          Optional[State]               = None
         self.grader:          Optional[AlethGrader]         = None
         self.reward_computer: Optional[AlethRewardComputer] = None
+        self.session_id:      str                           = str(uuid.uuid4())[:8]
+        self.task_difficulty: str                           = "easy"
+        self.chronicle:       ChronicleService              = ChronicleService()
 
     # ── OpenEnv API ───────────────────────────────────────────────────────────
 
@@ -56,6 +61,9 @@ class AlethEnv:
         claims       = {c["id"]: Claim(**c) for c in td["claims"]}
         papers       = {pid: Paper(**pd) for pid, pd in td["papers"].items()}
         ground_truth = {g["claim_id"]: GroundTruth(**g) for g in td["ground_truth"]}
+
+        self.task_difficulty = task
+        self.session_id = str(uuid.uuid4())[:8]
 
         self._state = State(
             task_id=task, claims=claims, papers=papers,
@@ -93,9 +101,42 @@ class AlethEnv:
         self._state.episode_done = done
 
         if done:
-            info["final_score"]       = self.grader.grade_episode(self._state)
-            info["grading_breakdown"] = self.grader.get_detailed_breakdown(self._state)
+            final_score = self.grader.grade_episode(self._state)
+            breakdown = self.grader.get_detailed_breakdown(self._state)
+            info["final_score"]       = final_score
+            info["grading_breakdown"] = breakdown
             info["steps_taken"]       = self._state.step_count
+
+            # Compute aggregate scores for components
+            accuracy_scores = []
+            reasoning_scores = []
+            drift_scores = []
+            for claim_breakdown in breakdown.values():
+                if "accuracy_component" in claim_breakdown:
+                    accuracy_scores.append(claim_breakdown["accuracy_component"])
+                    reasoning_scores.append(claim_breakdown["reasoning_component"])
+                    drift_scores.append(claim_breakdown["drift_component"])
+
+            avg_accuracy = sum(accuracy_scores) / len(accuracy_scores) if accuracy_scores else 0.5
+            avg_reasoning = sum(reasoning_scores) / len(reasoning_scores) if reasoning_scores else 0.5
+            avg_drift = sum(drift_scores) / len(drift_scores) if drift_scores else 0.5
+
+            # Save session to chronicle
+            try:
+                self.chronicle.create_session_record(
+                    session_id=self.session_id,
+                    task_difficulty=self.task_difficulty,
+                    state=self._state,
+                    ground_truth=self._state.ground_truth,
+                    final_score=final_score,
+                    accuracy_score=avg_accuracy,
+                    reasoning_score=avg_reasoning,
+                    drift_score=avg_drift,
+                )
+            except Exception as e:
+                # Log but don't fail the episode if chronicle save fails
+                import logging
+                logging.warning(f"Failed to save session to chronicle: {e}")
 
         return obs, reward, done, info
 

@@ -8,11 +8,13 @@ Fully compliant with the official OpenEnv HTTP protocol:
   GET  /state  → State dict
   GET  /health → {"status": "healthy"}
   GET  /schema → {"action": {...}, "observation": {...}, "state": {...}}
+  GET  /chronicle/tips → {"profile": {...}, "tips": [...], ...}
 
 Notes:
 - A new AlethEnv is created per /reset call (stateless between resets).
 - State is maintained within a session (between reset and submit/done).
 - The global _env is replaced on each /reset so /step and /state work in the same session.
+- Chronicle tracks session history and provides personalized tips.
 """
 
 import logging
@@ -23,6 +25,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from environment import AlethEnv
+from chronicle import ChronicleService
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,6 +38,9 @@ app = FastAPI(
 
 # Global env instance — replaced on each /reset call
 _env: Optional[AlethEnv] = None
+
+# Chronicle service for session tracking and tips
+_chronicle = ChronicleService()
 
 
 # ── Request / Response models (OpenEnv spec-compliant) ───────────────────────
@@ -176,6 +182,18 @@ async def get_state():
         raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
 
 
+@app.get("/chronicle/tips")
+async def chronicle_tips():
+    """
+    Get personalized tips based on session history and usage patterns.
+    Returns user profile, recent sessions, strengths, weaknesses, and recommendations.
+    """
+    try:
+        response = _chronicle.get_chronicle_response()
+        return response.model_dump(mode="json")
+    except Exception as exc:
+        logger.exception(f"/chronicle/tips unexpected error: {exc}")
+        raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
 
 
 @app.get("/health")
@@ -216,5 +234,5 @@ async def root():
         "name":        "Aleth",
         "version":     "1.1.0",
         "description": "OpenEnv citation verification benchmark",
-        "endpoints":   ["/reset", "/step", "/state", "/health", "/schema", "/docs"],
+        "endpoints":   ["/reset", "/step", "/state", "/chronicle/tips", "/health", "/schema", "/docs"],
     }
