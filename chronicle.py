@@ -21,6 +21,8 @@ from models import (
 
 logger = logging.getLogger(__name__)
 
+# Constants
+DEFAULT_SCORE = 0.5  # Default score when no data is available
 # Priority ordering for tip sorting
 PRIORITY_ORDER = {TipPriority.HIGH: 0, TipPriority.MEDIUM: 1, TipPriority.LOW: 2}
 
@@ -101,9 +103,9 @@ class UsageAnalyzer:
                 elif claim_type == "theoretical":
                     theoretical_scores.append(score)
 
-        empirical_acc = mean(empirical_scores) if empirical_scores else 0.5
-        methodological_acc = mean(methodological_scores) if methodological_scores else 0.5
-        theoretical_acc = mean(theoretical_scores) if theoretical_scores else 0.5
+        empirical_acc = mean(empirical_scores) if empirical_scores else DEFAULT_SCORE
+        methodological_acc = mean(methodological_scores) if methodological_scores else DEFAULT_SCORE
+        theoretical_acc = mean(theoretical_scores) if theoretical_scores else DEFAULT_SCORE
 
         # Difficulty breakdown
         easy_sessions = [s for s in self.sessions if s.task_difficulty == "easy"]
@@ -130,9 +132,9 @@ class UsageAnalyzer:
 
         return UserProfile(
             total_sessions=total_sessions,
-            avg_accuracy=mean([s.accuracy_score for s in self.sessions]) if self.sessions else 0.5,
-            avg_reasoning=mean([s.reasoning_score for s in self.sessions]) if self.sessions else 0.5,
-            avg_drift_detection=mean([s.drift_score for s in self.sessions]) if self.sessions else 0.5,
+            avg_accuracy=mean([s.accuracy_score for s in self.sessions]) if self.sessions else DEFAULT_SCORE,
+            avg_reasoning=mean([s.reasoning_score for s in self.sessions]) if self.sessions else DEFAULT_SCORE,
+            avg_drift_detection=mean([s.drift_score for s in self.sessions]) if self.sessions else DEFAULT_SCORE,
             avg_papers_per_session=mean(
                 [s.papers_read_count for s in self.sessions]
             ) if self.sessions else 0.0,
@@ -152,16 +154,16 @@ class UsageAnalyzer:
         """Return a default profile for zero sessions."""
         return UserProfile(
             total_sessions=0,
-            avg_accuracy=0.5,
-            avg_reasoning=0.5,
-            avg_drift_detection=0.5,
+            avg_accuracy=DEFAULT_SCORE,
+            avg_reasoning=DEFAULT_SCORE,
+            avg_drift_detection=DEFAULT_SCORE,
             avg_papers_per_session=0.0,
             avg_steps_per_session=0.0,
             best_difficulty=None,
             weakest_difficulty=None,
-            empirical_accuracy=0.5,
-            methodological_accuracy=0.5,
-            theoretical_accuracy=0.5,
+            empirical_accuracy=DEFAULT_SCORE,
+            methodological_accuracy=DEFAULT_SCORE,
+            theoretical_accuracy=DEFAULT_SCORE,
             total_claims_verified=0,
             task_completion_rate=0.0,
         )
@@ -432,7 +434,7 @@ class ChronicleService:
     def _key_concepts_match(self, reasoning: str, concepts: List[str]) -> float:
         """Check how many key concepts appear in the reasoning."""
         if not concepts:
-            return 0.5
+            return DEFAULT_SCORE
 
         reasoning_lower = reasoning.lower()
         matches = sum(

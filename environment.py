@@ -13,6 +13,7 @@ import uuid
 import logging
 from typing import Dict, Tuple, Any, Optional
 from pathlib import Path
+from statistics import mean
 
 from models import (                                  # absolute import
     Action, Observation, Reward, State,
@@ -123,9 +124,9 @@ class AlethEnv:
                     reasoning_scores.append(claim_breakdown["reasoning_component"])
                     drift_scores.append(claim_breakdown["drift_component"])
 
-            avg_accuracy = sum(accuracy_scores) / len(accuracy_scores) if accuracy_scores else DEFAULT_COMPONENT_SCORE
-            avg_reasoning = sum(reasoning_scores) / len(reasoning_scores) if reasoning_scores else DEFAULT_COMPONENT_SCORE
-            avg_drift = sum(drift_scores) / len(drift_scores) if drift_scores else DEFAULT_COMPONENT_SCORE
+            avg_accuracy = mean(accuracy_scores) if accuracy_scores else DEFAULT_COMPONENT_SCORE
+            avg_reasoning = mean(reasoning_scores) if reasoning_scores else DEFAULT_COMPONENT_SCORE
+            avg_drift = mean(drift_scores) if drift_scores else DEFAULT_COMPONENT_SCORE
 
             # Save session to chronicle
             try:
@@ -141,8 +142,7 @@ class AlethEnv:
                 )
             except Exception as e:
                 # Log but don't fail the episode if chronicle save fails
-                import logging
-                logging.warning(f"Failed to save session to chronicle: {e}")
+                logger.warning(f"Failed to save session to chronicle: {e}")
 
         return obs, reward, done, info
 
