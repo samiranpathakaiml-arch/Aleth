@@ -279,8 +279,9 @@ class PatternAnalyzer:
                 
                 action_counts[action_type] += 1
                 if reward is not None:
-                    avg_rewards[action_type] = (avg_rewards[action_type] * 
-                                                 (action_counts[action_type] - 1) + reward) / action_counts[action_type]
+                    # Incremental average: new_avg = (old_avg * (n-1) + new_value) / n
+                    count = action_counts[action_type]
+                    avg_rewards[action_type] = (avg_rewards[action_type] * (count - 1) + reward) / count
         
         conn.close()
         
@@ -380,7 +381,7 @@ class TipsGenerator:
                                 if action == "verify_claim"])
             
             if verify_actions > 0:
-                read_verify_ratio = read_actions / verify_actions if verify_actions > 0 else 0
+                read_verify_ratio = read_actions / verify_actions
                 if read_verify_ratio < 1.0:
                     tips.append({
                         "priority": "medium",
@@ -418,14 +419,14 @@ class Chronicle:
                       reward: Optional[float] = None):
         """Record an action in the current session."""
         if self._current_session is None:
-            raise RuntimeError("No active session. Call start_session() first.")
+            raise RuntimeError("No active session. Ensure /reset is called before recording actions.")
         
         self.db.add_action(self._current_session, action_type, details, reward)
     
     def end_session(self, final_score: float, steps_taken: int):
         """End the current session."""
         if self._current_session is None:
-            raise RuntimeError("No active session. Call start_session() first.")
+            raise RuntimeError("No active session to end. Ensure start_session() was called and the session has not already been finalized.")
         
         self.db.finalize_session(self._current_session, final_score, steps_taken)
         self._current_session = None

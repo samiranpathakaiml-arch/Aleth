@@ -17,7 +17,8 @@ def test_chronicle_session_creation():
         # Start a session
         session_id = chronicle.start_session("easy")
         assert session_id is not None
-        assert len(session_id) == 36  # UUID length
+        # UUID format with hyphens: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx = 36 characters
+        assert len(session_id) == 36, "Session ID should be a valid UUID string (36 chars with hyphens)"
         
         # Record actions
         chronicle.record_action("read_paper", {"paper_id": "paper1"}, reward=0.02)
