@@ -138,7 +138,9 @@ async def step(req: StepRequest):
         # ALL rewards are clamped strictly to (0.001, 0.999) because the
         # platform validator rejects any reward <= 0.0 or >= 1.0.
         if done:
-            raw_reward: Optional[float] = float(info.get("final_score", reward.total if reward is not None else 0.5))
+            # Use final_score from grader if available, otherwise use step reward
+            fallback_score = float(reward.total) if reward is not None else 0.5
+            raw_reward: Optional[float] = float(info.get("final_score", fallback_score))
             # Finalize chronicle session with actual score and step count
             final_score = float(info.get("final_score", raw_reward))
             steps_count = int(info.get("steps_taken", 1))

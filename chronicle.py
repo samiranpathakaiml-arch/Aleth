@@ -419,7 +419,7 @@ class Chronicle:
                       reward: Optional[float] = None):
         """Record an action in the current session."""
         if self._current_session is None:
-            raise RuntimeError("No active session. Ensure /reset is called before recording actions.")
+            raise RuntimeError("No active session. Call start_session() first.")
         
         self.db.add_action(self._current_session, action_type, details, reward)
     
