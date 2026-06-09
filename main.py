@@ -23,6 +23,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from environment import AlethEnv
+from chronicle import Chronicle
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,6 +36,9 @@ app = FastAPI(
 
 # Global env instance — replaced on each /reset call
 _env: Optional[AlethEnv] = None
+
+# Chronicle instance for session tracking
+_chronicle = Chronicle(db_path="chronicle.db")
 
 
 # ── Request / Response models (OpenEnv spec-compliant) ───────────────────────
@@ -93,6 +97,10 @@ async def reset(
         logger.info(f"POST /reset — task={task!r}")
         _env = AlethEnv()
         obs  = _env.reset(task=task)
+        
+        # Start a new chronicle session
+        _chronicle.start_session(task)
+        
         return ResetResponse(
             observation=obs.model_dump(mode="json"),
             reward=0.5,   # neutral non-null score; null would parse as 0.0 in some evaluators
@@ -120,12 +128,19 @@ async def step(req: StepRequest):
         logger.info(f"POST /step — action_type={action_dict.get('action_type')!r}")
         obs, reward, done, info = _env.step(action_dict)
 
+        # Record action in chronicle
+        action_type = action_dict.get("action_type", "unknown")
+        reward_value = float(reward.total) if reward is not None else None
+        _chronicle.record_action(action_type, action_dict, reward=reward_value)
+
         # When the episode is done, return the grader's episode score.
         # For intermediate steps, return the dense per-step reward.
         # ALL rewards are clamped strictly to (0.001, 0.999) because the
         # platform validator rejects any reward <= 0.0 or >= 1.0.
         if done and "final_score" in info:
             raw_reward: Optional[float] = float(info["final_score"])
+            # Finalize chronicle session
+            _chronicle.end_session(raw_reward, info.get("steps_taken", 0))
         else:
             raw_reward = float(reward.total) if reward is not None else None
 
@@ -216,5 +231,84 @@ async def root():
         "name":        "Aleth",
         "version":     "1.1.0",
         "description": "OpenEnv citation verification benchmark",
-        "endpoints":   ["/reset", "/step", "/state", "/health", "/schema", "/docs"],
+        "endpoints":   ["/reset", "/step", "/state", "/health", "/schema", "/chronicle/tips", "/chronicle/history", "/docs"],
     }
+
+
+# ── Chronicle Endpoints ────────────────────────────────────────────────────────
+
+class ChronicleQueryParams(BaseModel):
+    """Query parameters for chronicle endpoints."""
+    limit: int = Field(default=20, ge=1, le=100)
+    task_type: Optional[str] = Field(default=None)
+    detail_level: str = Field(default="summary")
+
+
+@app.get("/chronicle/tips")
+async def chronicle_tips(limit: int = 20, detail_level: str = "summary"):
+    """
+    Get personalized tips based on session history and usage patterns.
+    
+    Query parameters:
+    - limit: Number of recent sessions to analyze (default: 20, max: 100)
+    - detail_level: Level of detail for recommendations (default: "summary")
+    
+    Returns:
+    - tips: List of prioritized personalized recommendations
+    - metrics: Analysis metrics including task performance, action patterns, efficiency
+    - timestamp: When the recommendations were generated
+    - session_count: Number of sessions analyzed
+    """
+    try:
+        limit = max(1, min(limit, 100))
+        tips_data = _chronicle.get_tips(limit=limit, detail_level=detail_level)
+        return tips_data
+    except Exception as exc:
+        logger.exception(f"/chronicle/tips unexpected error: {exc}")
+        raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
+
+
+@app.get("/chronicle/history")
+async def chronicle_history(limit: int = 20, task_type: Optional[str] = None):
+    """
+    Get recent session history.
+    
+    Query parameters:
+    - limit: Number of recent sessions to return (default: 20, max: 100)
+    - task_type: Filter by task type (easy, medium, hard) - optional
+    
+    Returns:
+    - sessions: List of recent sessions with summary stats
+    - total: Number of sessions returned
+    - timestamp: When history was retrieved
+    """
+    try:
+        limit = max(1, min(limit, 100))
+        history = _chronicle.get_history(limit=limit, task_type=task_type)
+        return history
+    except Exception as exc:
+        logger.exception(f"/chronicle/history unexpected error: {exc}")
+        raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
+
+
+@app.get("/chronicle/session/{session_id}")
+async def chronicle_session_detail(session_id: str):
+    """
+    Get detailed information about a specific session.
+    
+    Path parameters:
+    - session_id: The session ID to retrieve
+    
+    Returns:
+    - Detailed session information including all actions and their rewards
+    """
+    try:
+        session = _chronicle.get_session_detail(session_id)
+        if session is None:
+            raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+        return session
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception(f"/chronicle/session/{session_id} unexpected error: {exc}")
+        raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
