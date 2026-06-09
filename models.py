@@ -172,7 +172,7 @@ class UserProfile(BaseModel):
     methodological_accuracy: float
     theoretical_accuracy: float
     total_claims_verified: int
-    task_completion_rate: float  # % of claims verified when submitted
+    task_completion_rate: float = Field(..., ge=0.0, le=1.0)  # Ratio of claims verified when submitted (0.0-1.0)
 
 
 class TipPriority(str, Enum):
