@@ -10,6 +10,7 @@ OpenEnv API:
 
 import json
 import uuid
+import logging
 from typing import Dict, Tuple, Any, Optional
 from pathlib import Path
 
@@ -22,6 +23,11 @@ from models import (                                  # absolute import
 from grader import AlethGrader                        # absolute import
 from reward import AlethRewardComputer                # absolute import
 from chronicle import ChronicleService                # absolute import
+
+logger = logging.getLogger(__name__)
+
+# Default component score when no verifications exist
+DEFAULT_COMPONENT_SCORE = 0.5
 
 
 class AlethEnv:
@@ -117,9 +123,9 @@ class AlethEnv:
                     reasoning_scores.append(claim_breakdown["reasoning_component"])
                     drift_scores.append(claim_breakdown["drift_component"])
 
-            avg_accuracy = sum(accuracy_scores) / len(accuracy_scores) if accuracy_scores else 0.5
-            avg_reasoning = sum(reasoning_scores) / len(reasoning_scores) if reasoning_scores else 0.5
-            avg_drift = sum(drift_scores) / len(drift_scores) if drift_scores else 0.5
+            avg_accuracy = sum(accuracy_scores) / len(accuracy_scores) if accuracy_scores else DEFAULT_COMPONENT_SCORE
+            avg_reasoning = sum(reasoning_scores) / len(reasoning_scores) if reasoning_scores else DEFAULT_COMPONENT_SCORE
+            avg_drift = sum(drift_scores) / len(drift_scores) if drift_scores else DEFAULT_COMPONENT_SCORE
 
             # Save session to chronicle
             try:

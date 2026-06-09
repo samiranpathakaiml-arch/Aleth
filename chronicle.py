@@ -8,6 +8,7 @@ This module provides:
 """
 
 import json
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
@@ -17,6 +18,11 @@ from models import (
     SessionRecord, UserProfile, TipRecommendation, TipPriority, ChronicleResponse,
     State, GroundTruth, Verification,
 )
+
+logger = logging.getLogger(__name__)
+
+# Priority ordering for tip sorting
+PRIORITY_ORDER = {TipPriority.HIGH: 0, TipPriority.MEDIUM: 1, TipPriority.LOW: 2}
 
 
 class SessionHistoryManager:
@@ -41,14 +47,14 @@ class SessionHistoryManager:
 
         sessions = []
         with open(self.sessions_file, "r", encoding="utf-8") as f:
-            for line in f:
+            for line_num, line in enumerate(f, 1):
                 line = line.strip()
                 if line:
                     try:
                         data = json.loads(line)
                         sessions.append(SessionRecord(**data))
-                    except Exception:
-                        pass  # Skip malformed lines
+                    except Exception as e:
+                        logger.warning(f"Skipping malformed line {line_num} in sessions.jsonl: {e}")
 
         # Return most recent first
         sessions.reverse()
@@ -117,24 +123,24 @@ class UsageAnalyzer:
         if hard_avg is not None:
             scores_by_diff["hard"] = hard_avg
 
-        best_diff = max(scores_by_diff, key=scores_by_diff.get) if scores_by_diff else None
-        worst_diff = min(scores_by_diff, key=scores_by_diff.get) if scores_by_diff else None
+        best_difficulty = max(scores_by_diff, key=scores_by_diff.get) if scores_by_diff else None
+        weakest_difficulty = min(scores_by_diff, key=scores_by_diff.get) if scores_by_diff else None
 
         completion_rate = (total_verified / total_claims) if total_claims > 0 else 0.0
 
         return UserProfile(
             total_sessions=total_sessions,
-            avg_accuracy=mean([s.accuracy_score for s in self.sessions]),
-            avg_reasoning=mean([s.reasoning_score for s in self.sessions]),
-            avg_drift_detection=mean([s.drift_score for s in self.sessions]),
+            avg_accuracy=mean([s.accuracy_score for s in self.sessions]) if self.sessions else 0.5,
+            avg_reasoning=mean([s.reasoning_score for s in self.sessions]) if self.sessions else 0.5,
+            avg_drift_detection=mean([s.drift_score for s in self.sessions]) if self.sessions else 0.5,
             avg_papers_per_session=mean(
                 [s.papers_read_count for s in self.sessions]
             ) if self.sessions else 0.0,
             avg_steps_per_session=mean(
                 [s.total_steps for s in self.sessions]
             ) if self.sessions else 0.0,
-            best_difficulty=best_diff,
-            weakest_difficulty=worst_diff,
+            best_difficulty=best_difficulty,
+            weakest_difficulty=weakest_difficulty,
             empirical_accuracy=empirical_acc,
             methodological_accuracy=methodological_acc,
             theoretical_accuracy=theoretical_acc,
@@ -294,16 +300,18 @@ class TipsGenerator:
 
         # Tip 5: Difficulty progression
         if self.profile.best_difficulty == "easy" and self.profile.total_sessions >= 3:
-            tips.append(TipRecommendation(
-                tip_id="progression_001",
-                title="Ready to Try Medium Difficulty",
-                description="You've mastered easy tasks consistently. "
-                           "Medium-difficulty challenges will help you develop deeper reasoning skills.",
-                priority=TipPriority.MEDIUM,
-                category="difficulty_progression",
-                evidence=f"Avg easy score: {mean([s.final_score for s in self.sessions if s.task_difficulty == 'easy']):.2%}",
-                suggested_action="Next session: reset with task='medium' to encounter multi-paper synthesis",
-            ))
+            easy_sessions = [s for s in self.sessions if s.task_difficulty == "easy"]
+            if easy_sessions:
+                tips.append(TipRecommendation(
+                    tip_id="progression_001",
+                    title="Ready to Try Medium Difficulty",
+                    description="You've mastered easy tasks consistently. "
+                               "Medium-difficulty challenges will help you develop deeper reasoning skills.",
+                    priority=TipPriority.MEDIUM,
+                    category="difficulty_progression",
+                    evidence=f"Avg easy score: {mean([s.final_score for s in easy_sessions]):.2%}",
+                    suggested_action="Next session: reset with task='medium' to encounter multi-paper synthesis",
+                ))
 
         # Tip 6: Claim-type specific
         if self.profile.empirical_accuracy < self.profile.theoretical_accuracy:
@@ -333,8 +341,7 @@ class TipsGenerator:
             ))
 
         # Return top 5 by priority
-        priority_order = {TipPriority.HIGH: 0, TipPriority.MEDIUM: 1, TipPriority.LOW: 2}
-        tips.sort(key=lambda t: priority_order[t.priority])
+        tips.sort(key=lambda t: PRIORITY_ORDER[t.priority])
         return tips[:5]
 
     def suggest_next_target(self) -> Optional[str]:
